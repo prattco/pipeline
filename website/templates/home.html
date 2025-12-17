@@ -1,0 +1,149 @@
+<!-- home.html-->
+
+{% extends "base.html" %} {% block title %}Home{% endblock %} 
+
+<style>
+  h2 {
+    color: rgba(0, 0, 0, 0.3); /* Black with 30% opacity (70% transparency) */
+  }
+  </style>
+  
+{% block content %}
+
+
+<br/>
+Hello {{ user.company_name }} Team!
+<h2 align="center">Notes</h2>
+{% if user.first_name == 'ALL' %}
+<style>
+  .replynote:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+  }
+</style>
+<script type="text/javascript">
+  function addReply(obj, note_id) {
+    if($("#note_reply_" + note_id).length == 0) {
+      replyarea = $('<li style="display: none;" class="list-group-item"><i class="fa fa-reply" style="transform: rotate(180deg);"></i><textarea name="note_reply_' + note_id + '" id="note_reply_' + note_id + '" class="form-control"></textarea></li>');
+      $(obj).after(replyarea);
+      replyarea.slideDown();
+    }
+    else {
+      $("#note_reply_" + note_id).parent().slideUp("normal", function() {
+        $("#note_reply_" + note_id).parent().remove();
+      });
+    }
+  }
+  function submitCheck() {
+        var datefrom = $('#date_from', $('#search_form'));
+        var dateto = $('#date_to', $('#search_form'));
+        datefrom[0].setCustomValidity('');
+        if(datefrom.val() != "" && dateto.val() != "") {
+          var from = new Date(datefrom.val());
+          var to = new Date(dateto.val());
+          if(from > to) {
+            datefrom[0].setCustomValidity('From Date cannot be later than To Date.');
+          }
+        }
+        datefrom[0].reportValidity();
+    }
+</script>
+
+<form method="POST" action="/" id="search_form">
+  <br/>
+  <div align="center">
+  {{ search_form.email.label }} {{ search_form.email() }} &nbsp;&nbsp;
+  {{ search_form.unreplied.label }} {{ search_form.unreplied() }} &nbsp;&nbsp;
+  {{ search_form.date_from.label }} {{ search_form.date_from() }} ~ {{ search_form.date_to.label }} {{ search_form.date_to() }} &nbsp;&nbsp;
+  <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SEARCH">
+  </div>
+</form>
+<form method="POST" action="/reply" id="reply_form">
+  <br/>
+  {{ search_form.email(type="hidden") }}
+  {{ search_form.unreplied(type="hidden") }}
+  {{ search_form.date_from(type="hidden") }}
+  {{ search_form.date_to(type="hidden") }}
+  {% for user_email, user_note in notes.items() %}
+  From : {{ user_email }}
+  <ul class="list-group list-group-flush" id="notes">
+    {% for note_id, note in user_note.items() %}
+    <li class="list-group-item replynote" onclick="addReply(this,'{{ note.id }}')">
+      {{ note.data }}
+      <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </li>
+      {% for reply in note.reply %}
+    <li class="list-group-item">
+      <i class="fa fa-reply" style="transform: rotate(180deg);"></i>
+      {{ reply.reply_data }}
+    </li>
+      {% endfor %}
+    {% endfor %}
+  </ul>
+  <br/>
+  {% endfor %}
+  {% if notes|length > 0 %}
+  <div align="center">
+    <button type="submit" class="btn btn-primary">Reply</button>
+  </div>
+  {% endif %}
+</form>
+{% else %}
+<ul class="list-group list-group-flush" id="notes">
+{% if notes|length > 0 %}
+  {% set note_list = notes[user.email] %}
+  {% for note_id, note in note_list.items() %}
+  <li class="list-group-item">
+    {{ note.data }}
+    <button type="button" class="close" onClick="deleteNote({{ note.id }})">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </li>
+    {% for reply in note.reply %}
+  <li class="list-group-item">
+    <i class="fa fa-reply" style="transform: rotate(180deg);"></i>
+    {{ reply.reply_data }}
+  </li>
+    {% endfor %}
+  {% endfor %}
+{% endif %}
+</ul>
+<form method="POST" action="/save_note" id="note_form">
+  <textarea name="note" id="note" class="form-control" placeholder="Inquiry? Please leave a note. Prattco team will reply back."></textarea>
+  <br />
+  <div align="center">
+    <button type="submit" class="btn btn-primary">Add Note</button>
+  </div>
+</form>
+{% endif %}
+<br/>
+<br/>
+<br/>
+<!-- <div style="display:flex; flex-direction: row; justify-content: center; align-items: flex-start; ">
+  <div>
+    <h2>Need any help?</h2>
+    <br/>
+    <ul style="list-style-type: square;">
+      <li>Main Office: 804 Mittel Drive, Wood Dale, IL 60191&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp</li>
+      <li>Phone: +1-847-906-2800</li>
+      <li>Website: <a href="https://chicagolandcfs.com/">https://chicagolandcfs.com/</a></li>
+      <li>General Info: <a href="mailto:info@chicagolandcfs.com">info@chicagolandcfs.com</a></li>
+      <li>Operation: <a href="mailto:supreme@chicagolandcfs.com">supreme@chicagolandcfs.com</a></li>
+      <li>Accounting: <a href="mailto:AR@chicagolandcfs.com">AR@chicagolandcfs.com</a></li>
+      <li>IT: <a href="mailto:IT@chicagolandcfs.com">IT@chicagolandcfs.com</a></li>
+    </ul>
+  </div> 
+   <div>
+    <br/>
+  </div>
+  <div>
+    <br/>
+    <br/>
+    <iframe width="415" height="233" src=https://www.youtube.com/embed/8cFHJNwDO38 title="Chicagoland CFS &amp; Warehousing 1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  </div>
+</div> -->
+<br/>
+<br/>
+{% endblock %}

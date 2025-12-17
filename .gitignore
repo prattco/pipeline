@@ -1,0 +1,8 @@
+.vscode
+website/localsqlcred
+website/__pycache__
+test
+website/forms/__pycache__
+website/lib/__pycache__
+website/modules/__pycache__
+website/validators/__pycache__

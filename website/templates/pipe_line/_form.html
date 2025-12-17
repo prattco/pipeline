@@ -1,0 +1,327 @@
+
+
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="{{ url_for('static', filename='js/form_common.js') }}"></script>
+<script type="text/javascript">
+    
+    function addLine() {
+        var detail_section = $('div#detail-section');
+        var insertRow = $('#insert_row').clone().removeAttr('id');
+
+        var index = -1;
+        $('div.detail-row', detail_section).each(function(i, div){
+          if ((val = parseInt($(div).attr('index'))) > index) {
+            index = val;
+          }
+        });
+        index++;
+
+        insertRow.attr("index", index);
+
+        indexingItem("date", insertRow);
+        indexingItem("note", insertRow);
+        indexingItem("follow_up", insertRow);
+        detail_section.append(insertRow);
+        refInputSetup(insertRow);        
+    }
+
+    function indexingItem(name, row) {
+        var index = row.attr("index");
+        var item_name_prefix = 'items-' + index;
+        var item = $('#' + name, row);
+        item.attr('id', item_name_prefix + "-" + item.attr('name'));
+        item.attr('name', item_name_prefix + "-" + item.attr('name'));
+    }
+
+
+    function deleteRow(obj) {
+        var row = $(obj).parent().parent();
+        row.remove();
+    }
+</script>
+
+{% include("/common/common_include.html") %}
+{% include("/common/display_errors.html") %}
+<br />
+<div align="center" class="form-group mx-sm-3 mb-2">
+    <form action="/pipe_line/save" method='POST' id="pipe_line_form">
+        <div align="left">
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
+        </div>
+        <br />
+        <br />
+        {{ form.hidden_tag() }}
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.shared.label }}
+                <i class="fa fa-info-circle field-info" description="Shared with LG?"></i>
+            </div>
+            <div class="columninput uneditable">
+                {{ form.shared() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.division.label }}
+                <i class="fa fa-info-circle field-info" description="Select one from options."></i>
+            </div>
+            <div class="columninput">
+                {{ form.division() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.entity.label }}
+                <i class="fa fa-info-circle field-info" description="Select one from options."></i>
+            </div>
+            <div class="columninput">
+                {{ form.entity() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.region.label }}
+                <i class="fa fa-info-circle field-info" description="Select one from options."></i>
+            </div>
+            <div class="columninput">
+                {{ form.region() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.owner.label }}
+                <i class="fa fa-info-circle field-info" description="Account manager or owner of the project."></i>
+            </div>
+            <div class="columninput">
+                {{ form.owner() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.product.label }}
+                <i class="fa fa-info-circle field-info" description="e.g. 'Rotary', 'Scroll'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.product() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.product_type.label }}
+                <i class="fa fa-info-circle field-info" description="e.g. 'Fixed', '2 Stage'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.product_type() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.customer.label }}
+                <i class="fa fa-info-circle field-info" description='company name.'></i>
+            </div>
+
+            <div class="columninput">
+                {{ form.customer() }}  
+            </div>
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.customer_prospect.label }}
+                <i class="fa fa-info-circle field-info" description='Arleady customer?'></i>
+            </div>
+            <div class="columninput">
+                {{ form.customer_prospect() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.application.label }}
+                <i class="fa fa-info-circle field-info" description="e.g. 'PHP','WSHP'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.application() }}
+            </div>
+
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.status.label }}
+                <i class="fa fa-info-circle field-info" description="Select one from options."></i>
+            </div>
+            <div class="columninput">
+                {{ form.status() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.project.label }}
+                <i class="fa fa-info-circle field-info" description="Provide a project name"></i>
+            </div>
+            <div class="columninput">
+                {{ form.project() }}
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.priority.label }}
+                <i class="fa fa-info-circle field-info" description="Select one from options."></i>
+            </div>
+            <div class="columninput">
+                {{ form.priority() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.refrigerant.label }}
+                <i class="fa fa-info-circle field-info" description="e.g. 'R410A', 'R454B'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.refrigerant() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.contact.label }}
+                <i class="fa fa-info-circle field-info" description="Contact person."></i>
+            </div>
+            <div class="columninput">
+                {{ form.contact() }}
+            </div>
+
+
+            <div class="columnlabel">
+                {{ form.resolved.label }}
+                <i class="fa fa-info-circle field-info" description="date of launched or closed"></i>
+            </div>
+            <div class="columninput">
+                {{ form.resolved() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.model.label }}
+                <i class="fa fa-info-circle field-info" description="Model/Customers/Application/EAU/LG Compressors"></i>
+            </div>
+            <div class="columninput">
+                {{ form.model() }}
+            </div>
+
+            <div class="columnlabel">
+                {{ form.system_models.label }}
+                <i class="fa fa-info-circle field-info" description="Customer's system model"></i>
+            </div>
+            <div class="columninput">
+                {{ form.system_models() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.target_spec.label }}
+                <i class="fa fa-info-circle field-info" description="Provide the target spec if any"></i>
+            </div>
+            <div class="columninput">
+                {{ form.target_spec() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.comp_model.label }}
+                <i class="fa fa-info-circle field-info" description="Prattco product model"></i>
+            </div>
+            <div class="columninput">
+                {{ form.comp_model() }}
+            </div>
+        </div>
+        
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.scope.label }}
+                <i class="fa fa-info-circle field-info" description="Project scope / EAU"></i>
+            </div>
+            <div class="columninput">
+                {{ form.scope() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.remark.label }}
+                <i class="fa fa-info-circle field-info" description="Leave a note"></i>
+            </div>
+            <div class="columninput">
+                {{ form.remark() }}
+            </div>
+
+        </div>
+
+
+        <hr>
+
+        <div align="center">
+            <input type="button" class="btn btn-primary btn-sm" onclick="addLine()" value="ADD ITEM" />
+        </div>
+        <br />
+        <div class="detail-section" id="detail-section">
+            <div class="detail-header">
+                <div class="detail-column width1" style="width: 60px;">
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.date.label }}
+                    <i class="fa fa-info-circle field-info" description="Date of communication."></i>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.follow_up.label }}
+                    <i class="fa fa-info-circle field-info" description="Date to follow up."></i>
+                </div>
+                <div class="detail-column width3">
+                    {{ item_form_template.note.label }}
+                    <i class="fa fa-info-circle field-info" description="Communications."></i>
+                </div>
+            </div>
+            {% for item_form in form.items %}
+            <div class="detail-row" index="{{loop.index0}}">
+                <div class="detail-column width1">
+                    {{ item_form.hidden_tag() }}
+                    <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.date() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.follow_up() }}
+                </div>
+                <div class="detail-column width3">
+                    {{ item_form.note() }}
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        <hr>
+
+        <br />
+        <div align="center">
+
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
+        </div>
+
+        <br />
+        <br />
+        <br />
+        <br />
+    </form>
+
+    <div style="display: none;">
+        <div class="detail-row" id="insert_row" index="">
+            <div class="detail-column width1">
+                <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
+            </div>
+            <div class="detail-column width1">
+                {{ item_form_template.date() }}
+            </div>
+
+            <div class="detail-column width1">
+                {{ item_form_template.follow_up() }}
+            </div>
+
+            <div class="detail-column width3">
+                {{ item_form_template.note() }}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+    <ul>
+    </ul>
+</div>

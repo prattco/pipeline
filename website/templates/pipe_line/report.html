@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}Pipe Lines{% endblock %}
+
+{% block content %}
+
+<br/>
+<h2 align="center">Pipe Lines</h2>
+<br/>
+
+<div style="text-align: center;">
+
+    <form action="" method="POST" align="center">
+
+        <button formaction="/download" type="submit" class="btn btn-primary btn-sm">DOWNLOAD</button>
+    </form>
+
+</div>
+
+<br />
+<br/>
+<h6 align="center">Select fields to display.</h6>
+
+
+<div style="text-align: center; margin-bottom: 20px;">
+    <!-- <label for="column-selector">Select Columns to Display:</label> -->
+    <select id="column-selector" multiple="multiple" style="width: 400px;">
+        <option value="0" selected>Conmpany</option>
+        <option value="1" selected>Customer Type</option>
+        <option value="2" >Application</option>
+        <option value="3" >Owner</option>
+        <option value="4" selected>Product</option>
+        <option value="5" >Product Type</option>
+
+        <option value="6" selected>Status</option>
+        <option value="7" >Refrigerant</option>
+        <option value="8" selected>Model</option>
+
+        <option value="9" selected>Latest Note</option>
+        <option value="10" selected>Latest Date</option>
+        <option value="11" >Comp Model</option>
+    </select>
+</div>
+
+<div style="display: flex; justify-content: center;">
+    <table id="list" class="display stripe compact" style="width: 95%; ">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Customer Type</th>
+                <th>Application</th>
+                <th>Owner</th>
+                <th>Product</th>
+                <th>Product Type</th>
+                <th>Status</th>
+                <th>Refrigerant</th>
+                <th>Model</th>
+
+                <th>Latest Note</th>
+                <th>Latest Date</th>
+                <th>Comp Model</th>
+
+
+            </tr>
+            <tr>
+                <th ><input type="text" data-column="0" class="filter-input" placeholder="Filter Company"></th>
+                <th ><input type="text" data-column="1" class="filter-input" placeholder="Filter Customer Type"></th>
+                <th><input type="text" data-column="2" class="filter-input" placeholder="Filter Application"></th>
+                <th><input type="text" data-column="3" class="filter-input" placeholder="Filter Owner"></th>
+                <th><input type="text" data-column="4" class="filter-input" placeholder="Filter Product"></th>
+                <th><input type="text" data-column="5" class="filter-input" placeholder="Filter Product Type"></th>
+
+                <th><input type="text" data-column="6" class="filter-input" placeholder="Filter Status"></th>
+                <th><input type="text" data-column="7" class="filter-input" placeholder="Filter Refrigerant"></th>
+                <th><input type="text" data-column="8" class="filter-input" placeholder="Filter Model"></th>
+
+                <th><input type="text" data-column="9" class="filter-input" placeholder="Filter Latest Note"></th>
+                <th><input type="text" data-column="10" class="filter-input" placeholder="Filter Latest Date"></th>
+                <th><input type="text" data-column="11" class="filter-input" placeholder="Filter Comp Model"></th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for pipe_line in list %}
+            <tr>
+                <td>
+                    <a href="/pipe_line/item/{{ pipe_line.id }}">{{ pipe_line.customer }}</a>
+                </td>
+                <td>
+                    {{ pipe_line.customer_prospect }}</a>
+                </td>
+                <td>
+                    {{ pipe_line.application }}
+                </td>
+                <td>
+                    {{ pipe_line.owner }}
+                </td>
+                <td>
+                    {{ pipe_line.product }}
+                </td>
+                <td>
+                    {{ pipe_line.product_type }}
+                </td>
+
+                <td>
+                    {{ pipe_line.status }}
+                </td>
+                <td>
+                    {{ pipe_line.refrigerant }}
+                </td>
+                <td>
+                    <a href="/pipe_line/item/{{ pipe_line.id }}">{{ pipe_line.model }}</a>
+                </td>
+
+                <td>
+                    {{ pipe_line.latest_note }}
+                </td>
+                <td>
+                    {{ pipe_line.latest_date }}
+                </td>
+                <td>
+                    {{ pipe_line.comp_model }}
+                </td>
+
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var table = $('#list').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        order: [[0, 'asc']],
+        pageLength: 100, // Set default "show entries" to 100
+        autoWidth: true, // Keep this false for explicit width control
+        columnDefs: [
+            { targets: '_all', className: 'dt-body-left'},
+            // Define width for ALL columns to ensure consistent sizing
+            { targets: 0, width: '5%' },  // Customer
+            { targets: 1, width: '5%' },  // Customer Type
+            { targets: 2, width: '5%' },  // Application
+            { targets: 3, width: '5%' },  // Owner
+            { targets: 4, width: '5%' },  // Product
+            { targets: 5, width: '5%' },  // Product Type
+            { targets: 6, width: '4%' },  // Status
+            { targets: 7, width: '5%' },  // Refrigerant
+            { targets: 8, width: '5%' },  // Model           
+            { targets: 9, width: '51%' },  // Latest Note - set to 25% (roughly 1.25x of Remark)
+            { targets: 10, width: '5%' },  // Latest Date
+            { targets: 11, width: '5%' },  // Comp Model
+
+            
+        ],
+
+        responsive: true
+    });
+
+    // Initialize Select2 on your column selector
+    $('#column-selector').select2({
+        placeholder: "Select columns",
+        allowClear: true
+    });
+
+    // Function to update column visibility
+    function updateColumnVisibility() {
+        var selectedColumns = $('#column-selector').val() || [];
+        var selectedColumnIndices = selectedColumns.map(Number);
+
+        table.columns().every(function(index) {
+            var isVisible = selectedColumnIndices.includes(index);
+            this.visible(isVisible);
+            // Also update the visibility of the filter input in the second header row
+            $('.filter-input[data-column="' + index + '"]').closest('th').toggle(isVisible);
+        });
+    }
+
+    // Populate the Select2 dropdown with actual column headers from DataTables
+    table.columns().every(function(index) {
+        var title = $(this.header()).eq(0).text().trim();
+        if (title !== '') {
+            var option = new Option(title, index, true, true);
+            $('#column-selector').append(option);
+        }
+    });
+
+    // Trigger initial display based on default selections (all selected initially).
+    updateColumnVisibility();
+
+    // Handle column visibility changes from the Select2 dropdown
+    $('#column-selector').on('change', function() {
+        updateColumnVisibility();
+    });
+
+    // --- Add this new section for default Status filter ---
+    const statusColumnIndex = 6; // Status column has index 7
+    const defaultStatusFilterValue = 'New, On going'; // The default values you want to filter by
+
+    // Set the value in the filter input field
+    $(`.filter-input[data-column="${statusColumnIndex}"]`).val(defaultStatusFilterValue);
+
+    // Apply the filter to the DataTables column
+    var statusColumn = table.column(statusColumnIndex);
+    var filterValues = defaultStatusFilterValue.split(',').map(function(item) {
+        return item.trim();
+    });
+
+    var regex = filterValues.join('|');
+    statusColumn.search(regex, true, false).draw();
+    // --- End of new section ---
+
+    $('.filter-input').on('keyup', function () {
+        var column = table.column($(this).data('column'));
+        var filterVal = this.value;
+        var filterValues = filterVal.split(',').map(function(item) {
+            return item.trim();
+        });
+        var regex = filterValues.join('|');
+        column
+            .search(regex, true, false)
+            .draw();
+    });
+});
+</script>
+
+{% endblock %}

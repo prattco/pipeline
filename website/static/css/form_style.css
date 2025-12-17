@@ -1,0 +1,154 @@
+.columninput textarea {
+    width: 220px;
+    resize: vertical;
+    min-height: 100px;
+    text-align: start;
+}
+
+
+.detail-row textarea {
+    width: 640px;
+    resize: both;
+    min-height: 100px;
+    text-align: start;
+}
+
+
+.columninput input[type="text"],
+.columninput input[type="number"],
+.columninput input[type="date"],
+.columninput select {
+    width: 220px;
+    text-align: start;
+}
+
+.detail-row input[type="text"],
+.detail-row input[type="number"] {
+    width: 220px;
+    text-align: start;
+}
+
+.input-container {
+    display: flex;
+    flex-wrap: wrap;
+    /* text-align: left; */
+}
+
+.input-container label {
+    width: 200px;
+    text-align: start;
+}
+
+.column {
+    display: flex;
+    box-sizing: border-box;
+}
+
+.columnlabel {
+    flex: 1;
+    font-weight: bold;
+    position: relative;
+}
+
+.columnlabel i {
+    position: absolute;
+    right: 0;
+    top: 35%;
+    transform: translateY(-50%);
+}
+
+.columninput {
+    flex: 1;
+}
+
+.detail-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-header {
+    display: flex;
+    font-weight: bold;
+}
+
+.detail-row {
+    display: flex;
+}
+
+.detail-column {
+    /* flex: 1; Remove flex for percentage widths */
+    padding: 2px;
+    text-align: left;
+    word-break: break-all;
+}
+
+/* Define widths for detail columns */
+.detail-column:nth-child(1) { /* Index column */
+    width: 5%;
+}
+
+.detail-column:nth-child(2) { /* Date column */
+    width: 5%;
+}
+
+.detail-column:nth-child(3) { /* Note column */
+    width: 90%;
+}
+
+.width1 {
+    flex: 1;
+}
+
+.width2 {
+    flex: 2;
+}
+
+.width3 {
+    flex: 3;
+}
+
+hr {
+    border-top: 1.5px solid rgb(85, 85, 85);
+}
+
+.minipopup ul {
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.minipopup li {
+    color: black;
+    padding: 3px;
+    text-decoration: none;
+    display: block;
+}
+
+.minipopup li:hover {
+    background-color: #007bff;
+    cursor: pointer;
+}
+
+.field-info:hover {
+    cursor: pointer;
+}
+
+.tooltipbox {
+    display: none;
+    position: absolute;
+    max-width: 250px;
+    white-space: normal;
+    border: 1px solid #ccc;
+    background-color: #f7f7f7;
+    border-radius: 4px;
+    padding: 5px;
+    color: black;
+    z-index: 1000;
+}
+
+@media (max-width: 600px) {
+    .column {
+        flex: 100%;
+    }
+}

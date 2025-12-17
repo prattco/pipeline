@@ -1,0 +1,70 @@
+{% extends "base.html" %} 
+{% block title %}Report{% endblock %} 
+{% block content %}
+   <br/> 
+  <h2 align="center">Pipleline Report</h2>
+
+  <br/>
+  
+  <form action="" method="POST" align="center">
+  <input type="submit" class="btn btn-primary btn-sm"  value="VIEW">
+  <button formaction="/download" type="submit" class="btn btn-primary btn-sm"  >DOWNLOAD</button>
+  </form>
+
+  <br/>
+  <br/>
+ 
+  {% for table in tables %}
+  <font size="2">
+  <table id="data" class="display stripe compact" style="width:100%">
+      <thead>
+          <tr>
+              {% for title in titles %}
+                  <th>{{ title }}</th>
+              {% endfor %}
+          </tr>      
+      </thead>
+
+      <tbody>
+        {% for row in row_data %}
+          <tr>
+            {% for cell in row %}
+            <td>{{ cell }}</td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+    </tbody>
+
+    <tfoot>
+      <tr>
+          {% for i in range(titles_length) %}
+              <th>{% if i == 9 %}Column Sum{% endif %}</th>
+          {% endfor %}
+      </tr>
+    </tfoot>
+
+  </table>
+  </font>
+
+  {% endfor %}
+
+  <script>
+    $(document).ready(function() {
+      $('table').DataTable({
+        paging: true,
+        searching: true,
+        ordering: true,
+        drawCallback: function(settings) {
+          var api = this.api();
+          var columnData = api.column(9, { page: 'current' }).data();
+          var columnSum = columnData.reduce(function(a, b) {
+            return parseInt(a) + parseInt(b);
+          }, 0);
+          $(api.column(9).footer()).html(columnSum);
+        },
+      });
+    });
+  </script>
+
+<br/>
+{% endblock %}

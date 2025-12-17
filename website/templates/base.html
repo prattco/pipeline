@@ -1,0 +1,155 @@
+<!-- base.html-->
+
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Menu style -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+
+    <!-- DataTables -->
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <link href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    
+    <!-- space between forms -->  
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />  
+  
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='table.css') }}"
+    />
+ 
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+      crossorigin="anonymous"
+    />
+
+        
+  <title>{% block title %}Home{% endblock %}</title>
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid justify-content-center">
+        <a class="nav-item nav-link" id="logo" href="/">
+          <img src="/static/logo.png" alt="logo" width="200" height="auto">
+        </a>
+
+        <a class="navbar-brand" href="#">&nbsp;&nbsp;&nbsp;</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse flex-grow-0" id="navbarNavDropdown">
+
+          <ul class="navbar-nav">
+
+            {% if user.is_authenticated %}
+
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/pipe_line/list">Entry</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/pipe_line/report">View</a>
+            </li>
+
+
+
+            <!-- <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                Request
+              </a>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/inbound_request/list">Inbound DO Request</a></li>
+                <li><a class="dropdown-item" href="/outbound_request/list">Outbound DO Request</a></li>
+                <li><a class="dropdown-item" href="/material_creation_request/list">Material Creation Request</a></li>
+                <li><a class="dropdown-item" href="/rework_request/list">Rework Request</a></li>
+              </ul>
+            </li> -->
+            
+
+
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/logout">Logout</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Login</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/sign-up">SignUp</a>
+            </li>
+            {% endif %}
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    {% with messages = get_flashed_messages(with_categories=true) %} 
+      {% if messages %}
+        {% for category, message in messages %} 
+          {% if category == 'error' %}
+            <div class="alert alert-danger alter-dismissable fade show" role="alert">
+            {{ message }}
+              <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          {% elif category == 'validate_error' %}
+          {% else %}
+            <div class="alert alert-success alter-dismissable fade show" role="alert">
+            {{ message }}
+              <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+          {% endif %}
+        {% endfor %} 
+      {% endif %} 
+    {% endwith %}
+    <div class="container">
+      {% block content %} 
+      {% endblock %}
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" 
+      integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" 
+      crossorigin="anonymous">
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js" 
+      integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa" 
+      crossorigin="anonymous">
+    </script>
+    
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous">
+    </script>
+
+    {% block javascript %}
+    <script type="text/javascript">
+      function deleteNote(noteId) {fetch("/delete-note", {method: "POST", 
+        body: JSON.stringify({ noteId: noteId }),}).then((_res) => {window.location.href = "/";});}
+    </script>
+    {% endblock %}
+  
+    <div align="left" class="tooltipbox"></div>
+  </body>
+</html>
