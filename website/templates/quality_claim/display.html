@@ -1,0 +1,156 @@
+{% extends "base.html" %} {% block title %}Quality Claim{% endblock %} 
+
+{% block content %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
+<script type="text/javascript">
+    function deleteData() {
+        if(confirm("Are you sure to delete?")) {
+            var $form = $('<form/>', {
+                    action: '/quality_claim/delete',
+                    method: 'POST'
+                });
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'delete_id',
+                value: '{{ form.id.data }}'
+            }).appendTo($form);
+
+            $form.appendTo('body').submit();
+        }
+    }
+    function createWithReference() {
+        location.href = '/quality_claim/create?refer={{ form.id.data }}';
+    }
+</script>
+
+<br/> 
+<h2 align="center">Quality Claim Display</h2>
+<br />
+<div class="form-group mx-sm-3 mb-2">
+    <div align="left">
+        <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/quality_claim/modify/{{ form.id.data }}'">
+        <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
+        <input type="button" class="btn btn-primary btn-sm" value="DELETE" onclick="deleteData()">
+    </div>
+</div>
+<br />
+<div class="form-group mx-sm-3 mb-2">
+
+    <div class="input-container">
+        <div class="columnlabel">
+            {{ form.status.label }}
+
+        </div>
+        <div class="columninput uneditable">
+            {{ form.status.data }}
+        </div>
+        <div class="columnlabel">
+            {{ form.customer.label }}
+        </div>
+        <div class="columninput">
+            {{ form.customer.data }}
+        </div>
+    </div>
+    <div class="input-container">
+        <div class="columnlabel">
+            {{ form.report_date.label }}
+        </div>
+        <div class="columninput">
+            {{ form.report_date.data }}
+        </div>
+        <div class="columnlabel">
+            {{ form.application.label }}
+        </div>
+        <div class="columninput">
+            {{ form.application.data }}
+        </div>
+    </div>
+    <div class="input-container">
+        <div class="columnlabel">
+            {{ form.model.label }}
+        </div>
+        <div class="columninput">
+            {{ form.model.data }}
+        </div>
+        <div class="columnlabel">
+            {{ form.type.label }}
+        </div>
+        <div class="columninput">
+            {{ form.type.data }}
+        </div>
+    </div>
+    <div class="input-container">
+        <div class="columnlabel">
+            {{ form.issue.label }}
+        </div>
+        <div class="columninput">
+            {{ form.issue.data }}
+        </div>
+        <div class="columnlabel">
+            {{ form.corrective_action.label }}
+        </div>
+
+        <div class="columninput">
+            {{ form.corrective_action.data }}  
+        </div>
+    </div>
+
+    <div class="input-container">
+
+        <div class="columnlabel">
+            {{ form.closed_date.label }}
+        </div>
+        <div class="columninput">
+            {{ form.closed_date.data }}
+        </div>
+        <div class="columnlabel">
+
+        </div>
+        <div class="columninput">
+
+        </div>
+
+    </div>
+   
+    <hr>
+
+    <div class="detail-section" id="detail-section">
+        <div class="detail-header">
+            <div class="detail-column width1">
+                Date
+            </div>
+            <div class="detail-column width1">
+                Follow Up
+            </div>
+            <div class="detail-column width3">
+                Note
+            </div>
+
+        </div>
+
+        {% if form.items %}
+            {# UPDATED LINE BELOW #}
+            {% for item_form in form.items | sort(attribute='date.data', reverse=True) %}
+                <div class="detail-row">
+                    <div class="detail-column width1">
+                        {{ item_form.date.data }}
+                    </div>
+                    <div class="detail-column width1">
+                        {{ item_form.follow_up.data }}
+                    </div>
+                    <div class="detail-column width3">
+                        {{ item_form.note.data }}
+                    </div>
+
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No items to display.</p>
+        {% endif %}
+
+    </div>
+
+    <hr>
+
+</div>
+{% endblock %}

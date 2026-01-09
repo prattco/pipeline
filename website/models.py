@@ -108,3 +108,58 @@ class PipeLineItem(db.Model):
 
 event.listen(PipeLineItem, 'before_insert', before_insert_listener)
 event.listen(PipeLineItem, 'before_update', before_update_listener)
+
+
+
+
+
+class QualityClaim(db.Model):
+    __tablename__ = 'quality_claim' # Explicit naming is good practice
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(None))    
+    customer = db.Column(db.String(None))
+    report_date = db.Column(db.Date)
+    application = db.Column(db.String(None))
+    model = db.Column(db.String(None))
+    type = db.Column(db.String(None))
+    issue = db.Column(db.String(None))
+    corrective_action = db.Column(db.String(None))
+    closed_date = db.Column(db.Date)   
+    delete_flag = db.Column(db.Integer, nullable=False, default=0)
+    
+    # Updated FKs to point to user_p
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    version_id = db.Column(db.Integer, nullable=False)
+    __mapper_args__ = {
+        'version_id_col': version_id
+    }
+    items = db.relationship('QualityClaimItem', back_populates='quality_claim', cascade='all, delete-orphan')
+
+event.listen(QualityClaim, 'before_insert', before_insert_listener)
+event.listen(QualityClaim, 'before_update', before_update_listener)
+
+class QualityClaimItem(db.Model):
+    __tablename__ = 'quality_claim_item' # Explicit naming
+    id = db.Column(db.Integer, primary_key=True)
+    quality_id = db.Column(db.Integer, db.ForeignKey('quality_claim.id'))
+    item_line = db.Column(db.Integer)
+    date = db.Column(db.Date, default=func.getdate())
+    follow_up = db.Column(db.Date)
+    note = db.Column(db.String(None)) 
+    
+    # Updated FKs to point to user_p
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    quality_claim = db.relationship('QualityClaim', back_populates='items')
+
+    # __table_args__ = (db.UniqueConstraint('inbound_request_id', 'item_line', name='unique_inbound_request_id_item_line'),)
+
+event.listen(QualityClaimItem, 'before_insert', before_insert_listener)
+event.listen(QualityClaimItem, 'before_update', before_update_listener)
