@@ -104,6 +104,40 @@
         </div>
         <div class="input-container">
             <div class="columnlabel">
+                {{ form.rma_no.label }}
+                <i class="fa fa-info-circle field-info" description='Origin Report RMA#.'></i>
+            </div>
+            <div class="columninput">
+                {{ form.rma_no() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.failure_loc.label }}
+                <i class="fa fa-info-circle field-info" description="Product failure location"></i>
+            </div>
+            <div class="columninput">
+                {{ form.failure_loc() }}
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.serial_no.label }}
+                <i class="fa fa-info-circle field-info" description='Serial number.'></i>
+            </div>
+            <div class="columninput">
+                {{ form.serial_no() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.credit_memo.label }}
+                <i class="fa fa-info-circle field-info" description="Credit Memo issued"></i>
+            </div>
+            <div class="columninput">
+                {{ form.credit_memo() }}
+            </div>
+        </div>        
+
+        <div class="input-container">
+            <div class="columnlabel">
                 {{ form.issue.label }}
                 <i class="fa fa-info-circle field-info" description='claim details'></i>
             </div>

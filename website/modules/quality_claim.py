@@ -56,13 +56,18 @@ def do_quality_claim_index():
                 'application': claim.application.strip() if claim.application else "",
                 'model': claim.model.strip() if claim.model else "",
                 'type': claim.type.strip() if claim.type else "",
+                'rma_no': claim.rma_no.strip() if claim.rma_no else "",
+                'failure_loc': claim.failure_loc.strip() if claim.failure_loc else "",
+                'serial_no': claim.serial_no.strip() if claim.serial_no else "",
                 'issue': claim.issue.strip() if claim.issue else "",
                 # FIXED: Corrected attribute name from .action to .corrective_action
                 'corrective_action': claim.corrective_action.strip() if claim.corrective_action else "",
                 'closed_date': claim.closed_date.strftime('%Y-%m-%d') if claim.closed_date else "",
+                'credit_memo': claim.credit_memo.strip() if claim.credit_memo else "",
                 'latest_note': latest_item.note if latest_item else "",
                 'latest_date': l_date,
                 'follow_up': f_up,
+                
             }
             quality_claim_list.append(quality_claim_data)
 

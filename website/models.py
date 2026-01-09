@@ -122,9 +122,13 @@ class QualityClaim(db.Model):
     application = db.Column(db.String(None))
     model = db.Column(db.String(None))
     type = db.Column(db.String(None))
+    rma_no = db.Column(db.String(None))
+    failure_loc = db.Column(db.String(None))
+    serial_no = db.Column(db.String(None))
     issue = db.Column(db.String(None))
     corrective_action = db.Column(db.String(None))
     closed_date = db.Column(db.Date)   
+    credit_memo = db.Column(db.String(None))
     delete_flag = db.Column(db.Integer, nullable=False, default=0)
     
     # Updated FKs to point to user_p
