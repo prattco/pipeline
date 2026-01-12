@@ -42,7 +42,7 @@ class QualityClaimForm(FlaskForm):
     credit_memo = StringField("Credit Memo")
     issue = TextAreaField("Issue")
     corrective_action = TextAreaField("Corrective Action")
-    closed_date = DateField("Closed Date", format='%Y-%m-%d', validators=[DataRequired()])
+    closed_date = DateField("Closed Date", format='%Y-%m-%d')
 
   
     items = FieldList(FormField(QualityClaimItemForm, default=QualityClaimItem), min_entries=0)
