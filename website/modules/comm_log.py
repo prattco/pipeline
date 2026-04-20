@@ -100,6 +100,9 @@ def do_comm_log_index():
 
                 'launch_date': comm_log.launch_date.strftime('%Y-%m-%d') if comm_log.launch_date else "",
                 'remark': comm_log.remark.strip() if comm_log.remark else "",
+
+                'latest_note': latest_item.note if latest_item else "",
+                'latest_date': l_date,
                 
             }
             comm_log_list.append(comm_log_data)
