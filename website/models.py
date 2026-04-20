@@ -109,9 +109,94 @@ class PipeLineItem(db.Model):
 event.listen(PipeLineItem, 'before_insert', before_insert_listener)
 event.listen(PipeLineItem, 'before_update', before_update_listener)
 
+class CommLog(db.Model):
+    __tablename__ = 'comm_log' # Explicit naming is good practice
+    id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.String(None))    
+    customer = db.Column(db.String(None))
+    owner = db.Column(db.String(None))
+    application = db.Column(db.String(None))
+    address = db.Column(db.String(None))
+    city = db.Column(db.String(None))
+    state = db.Column(db.String(None))
+    zip = db.Column(db.String(None))
+
+    contact1 = db.Column(db.String(None))
+    title1 = db.Column(db.String(None))
+    email1 = db.Column(db.String(None))
+    phone1 = db.Column(db.String(None))
+    office1 = db.Column(db.String(None))
+    cnote1 = db.Column(db.String(None))
+
+    contact2 = db.Column(db.String(None))
+    title2 = db.Column(db.String(None))
+    email2 = db.Column(db.String(None))
+    phone2 = db.Column(db.String(None))
+    office2 = db.Column(db.String(None))
+    cnote2 = db.Column(db.String(None))
+
+    contact3 = db.Column(db.String(None))
+    title3 = db.Column(db.String(None))
+    email3 = db.Column(db.String(None))
+    phone3 = db.Column(db.String(None))
+    office3 = db.Column(db.String(None))
+    cnote3 = db.Column(db.String(None))
+
+    contact4 = db.Column(db.String(None))
+    title4 = db.Column(db.String(None))
+    email4 = db.Column(db.String(None))
+    phone4 = db.Column(db.String(None))
+    office4 = db.Column(db.String(None))
+    cnote4 = db.Column(db.String(None))
+
+    contact5 = db.Column(db.String(None))
+    title5 = db.Column(db.String(None))
+    email5 = db.Column(db.String(None))
+    phone5 = db.Column(db.String(None))
+    office5 = db.Column(db.String(None))
+    cnote5 = db.Column(db.String(None))
+
+    launch_date = db.Column(db.Date)
+    remark = db.Column(db.String(None))
+
+    delete_flag = db.Column(db.Integer, nullable=False, default=0)
+    
+    # Updated FKs to point to user_p
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    version_id = db.Column(db.Integer, nullable=False)
+    __mapper_args__ = {
+        'version_id_col': version_id
+    }
+    items = db.relationship('CommLogItem', back_populates='comm_log', cascade='all, delete-orphan')
+
+event.listen(CommLog, 'before_insert', before_insert_listener)
+event.listen(CommLog, 'before_update', before_update_listener)
+
+class CommLogItem(db.Model):
+    __tablename__ = 'comm_log_item' # Explicit naming
+    id = db.Column(db.Integer, primary_key=True)
+    comm_log_id = db.Column(db.Integer, db.ForeignKey('comm_log.id'))
+    item_line = db.Column(db.Integer)
+    date = db.Column(db.Date, default=func.getdate())
+    contact = db.Column(db.String(None))
+    method = db.Column(db.String(None))
+    note = db.Column(db.String(None)) 
+    
+    # Updated FKs to point to user_p
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    comm_log = db.relationship('CommLog', back_populates='items')
 
 
-
+event.listen(CommLogItem, 'before_insert', before_insert_listener)
+event.listen(CommLogItem, 'before_update', before_update_listener)
 
 class QualityClaim(db.Model):
     __tablename__ = 'quality_claim' # Explicit naming is good practice

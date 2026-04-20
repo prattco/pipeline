@@ -1,154 +1,104 @@
+/* --- General Input Fixes --- */
+.columninput input, 
+.columninput select, 
 .columninput textarea {
-    width: 220px;
-    resize: vertical;
-    min-height: 100px;
-    text-align: start;
-}
-
-
-.detail-row textarea {
-    width: 640px;
-    resize: both;
-    min-height: 100px;
-    text-align: start;
-}
-
-
-.columninput input[type="text"],
-.columninput input[type="number"],
-.columninput input[type="date"],
-.columninput select {
-    width: 220px;
-    text-align: start;
-}
-
-.detail-row input[type="text"],
-.detail-row input[type="number"] {
-    width: 220px;
-    text-align: start;
-}
-
-.input-container {
-    display: flex;
-    flex-wrap: wrap;
-    /* text-align: left; */
-}
-
-.input-container label {
-    width: 200px;
-    text-align: start;
-}
-
-.column {
-    display: flex;
+    width: 100%; /* Fill the container */
+    max-width: 250px; /* Limits size in the top section */
     box-sizing: border-box;
 }
 
-.columnlabel {
-    flex: 1;
-    font-weight: bold;
-    position: relative;
+.columninput textarea {
+    min-height: 80px;
+    resize: vertical;
 }
 
-.columnlabel i {
-    position: absolute;
-    right: 0;
-    top: 35%;
-    transform: translateY(-50%);
+
+/* --- Layout Containers --- */
+.input-container {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.columnlabel {
+    flex: 0 0 150px; /* Labels get a consistent width */
+    font-weight: bold;
+    padding: 5px;
 }
 
 .columninput {
     flex: 1;
+    min-width: 200px;
+    padding: 5px;
 }
 
-.detail-section {
-    display: flex;
-    flex-direction: column;
-}
-
-.detail-header {
-    display: flex;
-    font-weight: bold;
-}
-
-.detail-row {
-    display: flex;
-}
-
-.detail-column {
-    /* flex: 1; Remove flex for percentage widths */
-    padding: 2px;
-    text-align: left;
-    word-break: break-all;
-}
-
-/* Define widths for detail columns */
-.detail-column:nth-child(1) { /* Index column */
-    width: 5%;
-}
-
-.detail-column:nth-child(2) { /* Date column */
-    width: 5%;
-}
-
-.detail-column:nth-child(3) { /* Note column */
-    width: 90%;
-}
-
-.width1 {
-    flex: 1;
-}
-
-.width2 {
-    flex: 2;
-}
-
-.width3 {
-    flex: 3;
-}
-
+/* --- Utility Classes --- */
 hr {
-    border-top: 1.5px solid rgb(85, 85, 85);
-}
-
-.minipopup ul {
-    padding-left: 5px;
-    padding-right: 5px;
-    margin-top: 0;
-    margin-bottom: 0;
-}
-
-.minipopup li {
-    color: black;
-    padding: 3px;
-    text-decoration: none;
-    display: block;
-}
-
-.minipopup li:hover {
-    background-color: #007bff;
-    cursor: pointer;
-}
-
-.field-info:hover {
-    cursor: pointer;
+    border: 0;
+    border-top: 1.5px solid #555;
+    margin: 20px 0;
 }
 
 .tooltipbox {
     display: none;
     position: absolute;
-    max-width: 250px;
-    white-space: normal;
+    background: #f7f7f7;
     border: 1px solid #ccc;
-    background-color: #f7f7f7;
-    border-radius: 4px;
     padding: 5px;
-    color: black;
     z-index: 1000;
 }
 
-@media (max-width: 600px) {
-    .column {
-        flex: 100%;
-    }
+
+
+/* Ensure the container can handle the width */
+.detail-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-header, .detail-row {
+    display: flex;
+    width: 100%;
+    align-items: flex-start; /* Keeps inputs aligned to top even if Note grows tall */
+    gap: 5px; /* Adds a small consistent gap between columns */
+}
+
+/* Base style for all columns */
+.detail-column {
+    min-width: 0; /* CRITICAL: This allows the column to shrink smaller than the input inside it */
+    padding: 4px;
+}
+
+/* --- THE FIX: Specific Column Ratios --- */
+
+/* 1. Delete/Icon Column */
+.detail-column:nth-child(1) {
+    flex: 0 0 30px; /* Does not grow or shrink, stays 30px */
+}
+
+/* 2. Short Columns (Date, Follow Up, Method) */
+/* We target the 2nd and 3rd columns specifically for dates */
+.detail-column:nth-child(2),
+.detail-column:nth-child(3) {
+    flex: 0 0 140px; /* Fixed width for date inputs so they don't squash */
+}
+
+/* 3. The "Greedy" Column (Note) */
+/* This is the last column. It will take all remaining space. */
+.detail-column:last-child {
+    flex: 1 1 auto; /* Grow to fill space, shrink if needed */
+}
+
+/* Ensure inputs/textareas actually fill the column width provided above */
+.detail-column input, 
+.detail-column select, 
+.detail-column textarea {
+    width: 100% !important; 
+    box-sizing: border-box; /* Includes padding in the 100% calculation */
+}
+
+.detail-column textarea {
+    min-height: 80px;
+    resize: vertical; /* Prevents the user from manually stretching the width and breaking the UI */
 }

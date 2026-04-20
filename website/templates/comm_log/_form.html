@@ -1,0 +1,520 @@
+
+
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="{{ url_for('static', filename='js/form_common.js') }}"></script>
+<script type="text/javascript">
+    
+    function addLine() {
+        var detail_section = $('div#detail-section');
+        var insertRow = $('#insert_row').clone().removeAttr('id');
+
+        var index = -1;
+        $('div.detail-row', detail_section).each(function(i, div){
+          if ((val = parseInt($(div).attr('index'))) > index) {
+            index = val;
+          }
+        });
+        index++;
+
+        insertRow.attr("index", index);
+
+        indexingItem("date", insertRow);
+        indexingItem("contact", insertRow);
+        indexingItem("method", insertRow);
+        indexingItem("note", insertRow);
+
+        detail_section.append(insertRow);
+        refInputSetup(insertRow);        
+    }
+
+    function indexingItem(name, row) {
+        var index = row.attr("index");
+        var item_name_prefix = 'items-' + index;
+        var item = $('#' + name, row);
+        item.attr('id', item_name_prefix + "-" + item.attr('name'));
+        item.attr('name', item_name_prefix + "-" + item.attr('name'));
+    }
+
+
+    function deleteRow(obj) {
+        var row = $(obj).parent().parent();
+        row.remove();
+    }
+</script>
+
+{% include("/common/common_include.html") %}
+{% include("/common/display_errors.html") %}
+<br />
+<div align="center" class="form-group mx-sm-3 mb-2">
+    <form action="/comm_log/save" method='POST' id="comm_log_form">
+        <div align="left">
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
+        </div>
+        <br />
+        <br />
+        {{ form.hidden_tag() }}
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.status.label }}
+                <i class="fa fa-info-circle field-info" description='Active or Inactive?'></i>
+            </div>
+            <div class="columninput uneditable">
+                {{ form.status() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.customer.label }}
+                <i class="fa fa-info-circle field-info" description="Customer's name."></i>
+            </div>
+            <div class="columninput">
+                {{ form.customer() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.owner.label }}
+                <i class="fa fa-info-circle field-info" description="Account Manager."></i>
+            </div>
+            <div class="columninput">
+                {{ form.owner() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.application.label }}
+                <i class="fa fa-info-circle field-info" description="Customer's application."></i>
+            </div>
+            <div class="columninput">
+                {{ form.application() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.address.label }}
+                <i class="fa fa-info-circle field-info" description='Customer Address.'></i>
+            </div>
+            <div class="columninput">
+                {{ form.address() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.city.label }}
+                <i class="fa fa-info-circle field-info" description='Customer City'></i>
+            </div>
+            <div class="columninput">
+                {{ form.city() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.state.label }}
+                <i class="fa fa-info-circle field-info" description='Customer State.'></i>
+            </div>
+            <div class="columninput">
+                {{ form.state() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.zip.label }}
+                <i class="fa fa-info-circle field-info" description='Customer Zip'></i>
+            </div>
+            <div class="columninput">
+                {{ form.zip() }}
+            </div>
+        </div>
+
+        <br />
+        
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.contact1.label }}
+                <i class="fa fa-info-circle field-info" description='Contact Name.'></i>
+            </div>
+            <div class="columninput">
+                {{ form.contact1() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.title1.label }}
+                <i class="fa fa-info-circle field-info" description="Contact's title"></i>
+            </div>
+            <div class="columninput">
+                {{ form.title1() }}
+            </div>
+        </div>        
+
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.email1.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's email'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.email1() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.phone1.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's phone.'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.phone1() }}
+            </div>
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.office1.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's office'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.office1() }}
+            </div>
+
+            <div class="columnlabel">
+                {{ form.cnote1.label }}
+                <i class="fa fa-info-circle field-info" description="Note for the Contact"></i>
+            </div>
+            <div class="columninput">
+                {{ form.cnote1() }}
+            </div>
+
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.contact2.label }}
+                <i class="fa fa-info-circle field-info" description='Contact Name.'></i>
+            </div>
+            <div class="columninput">
+                {{ form.contact2() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.title2.label }}
+                <i class="fa fa-info-circle field-info" description="Contact's title"></i>
+            </div>
+            <div class="columninput">
+                {{ form.title2() }}
+        
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.email2.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's email'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.email2() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.phone2.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's phone.'"></i>
+            </div>
+
+            <div class="columninput">
+                {{ form.phone2() }}  
+            </div>
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.office2.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's office'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.office2() }}
+            </div>
+
+            <div class="columnlabel">
+                {{ form.cnote2.label }}
+                <i class="fa fa-info-circle field-info" description="Note for the Contact"></i>
+            </div>
+            <div class="columninput">
+                {{ form.cnote2() }}
+            </div>
+
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.contact3.label }}
+                <i class="fa fa-info-circle field-info" description='Contact Name.'></i>
+            </div>
+            <div class="columninput">
+                {{ form.contact3() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.title3.label }}
+                <i class="fa fa-info-circle field-info" description="Contact's title"></i>
+            </div>
+            <div class="columninput">
+                {{ form.title3() }}
+            </div>
+        </div>        
+
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.email3.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's email'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.email3() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.phone3.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's phone.'"></i>
+            </div>
+
+            <div class="columninput">
+                {{ form.phone3() }}  
+            </div>
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.office3.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's office'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.office3() }}
+            </div>
+
+            <div class="columnlabel">
+                {{ form.cnote3.label }}
+                <i class="fa fa-info-circle field-info" description="Note for the Contact"></i>
+            </div>
+            <div class="columninput">
+                {{ form.cnote3() }}
+            </div>
+
+        </div>
+
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.contact4.label }}
+                <i class="fa fa-info-circle field-info" description='Contact Name.'></i>
+            </div>
+            <div class="columninput">
+                {{ form.contact4() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.title4.label }}
+                <i class="fa fa-info-circle field-info" description="Contact's title"></i>
+            </div>
+            <div class="columninput">
+                {{ form.title4() }}
+            </div>
+        </div>        
+
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.email4.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's email'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.email4() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.phone4.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's phone.'"></i>
+            </div>
+
+            <div class="columninput">
+                {{ form.phone4() }}  
+            </div>
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.office4.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's office'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.office4() }}
+            </div>
+
+            <div class="columnlabel">
+                {{ form.cnote4.label }}
+                <i class="fa fa-info-circle field-info" description="Note for the Contact"></i>
+            </div>
+            <div class="columninput">
+                {{ form.cnote4() }}
+            </div>
+
+        </div>
+
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.contact5.label }}
+                <i class="fa fa-info-circle field-info" description='Contact Name.'></i>
+            </div>
+            <div class="columninput">
+                {{ form.contact5() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.title5.label }}
+                <i class="fa fa-info-circle field-info" description="Contact's title"></i>
+            </div>
+            <div class="columninput">
+                {{ form.title5() }}
+            </div>
+        </div>        
+
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.email5.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's email'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.email5() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.phone5.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's phone.'"></i>
+            </div>
+
+            <div class="columninput">
+                {{ form.phone5() }}  
+            </div>
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.office5.label }}
+                <i class="fa fa-info-circle field-info" description="'Contact's office'"></i>
+            </div>
+            <div class="columninput">
+                {{ form.office5() }}
+            </div>
+
+            <div class="columnlabel">
+                {{ form.cnote5.label }}
+                <i class="fa fa-info-circle field-info" description="Note for the Contact"></i>
+            </div>
+            <div class="columninput">
+                {{ form.cnote5() }}
+            </div>
+
+        </div>
+
+        <div class="input-container">
+
+            <div class="columnlabel">
+                {{ form.launch_date.label }}
+                <i class="fa fa-info-circle field-info" description="Launched Date"></i>
+            </div>
+            <div class="columninput">
+                {{ form.launch_date() }}
+            </div>
+            
+            <div class="columnlabel">
+                {{ form.remark.label }}
+                <i class="fa fa-info-circle field-info" description="Note for the Customer"></i>
+            </div>
+            <div class="columninput">
+                {{ form.remark() }}
+            </div>
+    
+        </div>
+
+
+        <hr>
+
+
+        <div align="center">
+            <input type="button" class="btn btn-primary btn-sm" onclick="addLine()" value="ADD ITEM" />
+        </div>
+        <br />
+        <div class="detail-section" id="detail-section">
+            <div class="detail-header">
+                <div class="detail-column width1" >
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.date.label }}
+                    <i class="fa fa-info-circle field-info" description="Date of communication."></i>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.contact.label }}
+                    <i class="fa fa-info-circle field-info" description="Contact person."></i>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.method.label }}
+                    <i class="fa fa-info-circle field-info" description="Contact method."></i>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.note.label }}
+                    <i class="fa fa-info-circle field-info" description="Communications."></i>
+                </div>
+            </div>
+            {% for item_form in form.items %}
+            <div class="detail-row" index="{{loop.index0}}">
+                <div class="detail-column width1">
+                    {{ item_form.hidden_tag() }}
+                    <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.date() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.contact() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.method() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.note() }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <hr>
+
+        <br />
+        <div align="center">
+
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
+        </div>
+
+        <br />
+        <br />
+        <br />
+        <br />
+    </form>
+
+    <div style="display: none;">
+        <div class="detail-row" id="insert_row" index="">
+            <div class="detail-column width1">
+                <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
+            </div>
+
+            
+            <div class="detail-column width1">
+                {{ item_form_template.date() }}
+            </div>
+
+            <div class="detail-column width1">
+                {{ item_form_template.contact() }}
+            </div>
+
+            <div class="detail-column width1">
+                {{ item_form_template.method() }}
+            </div>
+            
+            <div class="detail-column width1">
+                {{ item_form_template.note() }}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+    <ul>
+    </ul>
+</div>
