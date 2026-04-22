@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% block title %}Quote Request{% endblock %}
+
+{% block content %}
+
+<br/>
+<h2 align="center">Quote Request</h2>
+<br/>
+
+<div style="text-align: center;">
+
+    <form action="" method="POST" align="center">
+        <input type="button" class="btn btn-primary btn-sm" onclick="location.href='/quote_request/create'"
+        value="CREATE QUOTE" />
+        <!-- <button formaction="/download" type="submit" class="btn btn-primary btn-sm">DOWNLOAD</button> -->
+    </form>
+
+</div>
+
+<br />
+<br/>
+<h6 align="center">Select fields to display.</h6>
+
+
+<div style="text-align: center; margin-bottom: 20px;">
+    <!-- <label for="column-selector">Select Columns to Display:</label> -->
+    <select id="column-selector" multiple="multiple" style="width: 400px;">
+        <option value="0" selected>Requester</option>
+        <option value="1" selected>Customer</option>
+        <option value="2" selected>Status</option>
+        <option value="3" selected>Location</option>
+        <option value="4" selected>Type</option>
+        <option value="5" selected>Application</option>
+        <option value="6" selected>Terms</option>
+        <option value="7">Remark</option>
+        <option value="8" selected>Created Date</option>
+        <option value="9" selected>Updated Date</option>
+               
+    </select>
+</div>
+<div style="display: flex; justify-content: center;">
+    <table id="list" class="display stripe compact" style="width: 95%; ">
+        <thead>
+            <tr>
+                <th>Requester</th>
+                <th>Customer</th>
+                <th>Status</th>
+                <th>Location</th>
+                <th>Type</th>
+                <th>Application</th>
+                <th>Terms</th>
+                <th>Remark</th>
+                <th>Created Date</th>
+                <th>Updated Date</th>
+
+            </tr>
+            <tr>
+                <th ><input type="text" data-column="0" class="filter-input" placeholder="Filter Requester"></th>
+                <th ><input type="text" data-column="1" class="filter-input" placeholder="Filter Customer"></th>
+                <th><input type="text" data-column="2" class="filter-input" placeholder="Filter Status"></th>
+                <th><input type="text" data-column="3" class="filter-input" placeholder="Filter location"></th>
+                <th><input type="text" data-column="4" class="filter-input" placeholder="Filter type"></th>
+                <th><input type="text" data-column="5" class="filter-input" placeholder="Filter application"></th>
+                <th><input type="text" data-column="6" class="filter-input" placeholder="Filter terms"></th>
+                <th><input type="text" data-column="7" class="filter-input" placeholder="Filter remark"></th>
+                <th><input type="text" data-column="8" class="filter-input" placeholder="Filter created_date"></th>
+                <th><input type="text" data-column="9" class="filter-input" placeholder="Filter updated_date"></th>
+
+                <!-- <th><input type="text" data-column="8" class="filter-input" placeholder="Filter Created Date"></th>
+                <th><input type="text" data-column="9" class="filter-input" placeholder="Filter Updated Date"></th> -->
+  
+
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for quote_request in quote_requests %}
+            <tr>
+                <td>
+                    {{ quote_request.requester }}
+                </td>
+                <td>
+                    <a href="/quote_request/display/{{ quote_request.id }}">{{ quote_request.customer }}</a>
+                </td>
+                <td>
+                    {{ quote_request.status }}
+                </td>
+                <td>
+                    {{ quote_request.location }}
+                </td>
+                <td>
+                    {{ quote_request.type }}</a>
+                </td>
+                <td>
+                    {{ quote_request.application }}
+                </td>
+                <td>
+                    {{ quote_request.terms }}
+                </td>
+                <td>
+                    {{ quote_request.remark }}
+                </td>
+
+
+                <td>
+                    {{ quote_request.created_date }}
+                </td>
+                <td>
+                    {{ quote_request.updated_date }}
+                </td>
+
+
+
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Initialize DataTable
+        var table = $('#list').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            order: [[0, 'asc']], 
+            pageLength: 100,
+            autoWidth: false, 
+            // columnDefs: [
+            //     { targets: '_all', className: 'dt-body-left'},
+            //     // Width adjustments for 15 columns (Indices 0-14)
+            //     { targets: [0, 2, 3, 5, 12, 14], width: '5%' },   // Status, Dates, App, Type
+            //     { targets: [1, 4, 6, 8, 9], width: '7%' },      // IDs, Customer, Model
+            //     { targets: 7, width: '10%' },                    // Failure Location
+            //     { targets: [10, 11, 13], width: '15%' },         // Long text fields (Issue, Action, Note)
+            // ],
+            responsive: true
+        });
+    
+        // Initialize Select2
+        $('#column-selector').select2({
+            placeholder: "Select columns",
+            allowClear: true
+        });
+    
+        // Function to update column visibility
+        function updateColumnVisibility() {
+            var selectedColumns = $('#column-selector').val() || [];
+            var selectedColumnIndices = selectedColumns.map(Number);
+    
+            table.columns().every(function(index) {
+                var isVisible = selectedColumnIndices.includes(index);
+                this.visible(isVisible);
+                // Sync visibility of the filter inputs in the second header row
+                $('.filter-input[data-column="' + index + '"]').closest('th').toggle(isVisible);
+            });
+        }
+    
+        $('#column-selector').on('change', function() {
+            updateColumnVisibility();
+        });
+    
+        // Default Status filter (Index 0)
+        const statusColumnIndex = 0; 
+        const defaultStatusFilterValue = ''; 
+    
+        $(`.filter-input[data-column="${statusColumnIndex}"]`).val(defaultStatusFilterValue);
+        var filterValues = defaultStatusFilterValue.split(',').map(item => item.trim());
+        var regex = filterValues.join('|');
+        table.column(statusColumnIndex).search(regex, true, false).draw();
+    
+        // Individual Column Filtering logic
+        $('.filter-input').on('keyup', function () {
+            var colIdx = $(this).data('column');
+            var filterVal = this.value;
+            
+            var filterValues = filterVal.split(',').map(item => item.trim());
+            var regex = filterValues.join('|');
+            
+            table.column(colIdx)
+                .search(regex, true, false)
+                .draw();
+        });
+    
+        // Run visibility check on load
+        updateColumnVisibility();
+    });
+    </script>
+
+{% endblock %}

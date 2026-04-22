@@ -252,3 +252,60 @@ class QualityClaimItem(db.Model):
 
 event.listen(QualityClaimItem, 'before_insert', before_insert_listener)
 event.listen(QualityClaimItem, 'before_update', before_update_listener)
+
+
+
+
+class QuoteRequest(db.Model):
+    __tablename__ = 'quote_request' # Explicit naming is good practice
+    id = db.Column(db.Integer, primary_key=True)   
+    requester = db.Column(db.String(None))
+    customer = db.Column(db.String(None))
+    status = db.Column(db.String(None))
+    location = db.Column(db.String(None))
+    type = db.Column(db.String(None))
+
+    application = db.Column(db.String(None))
+    terms = db.Column(db.String(None))
+    remark = db.Column(db.String(None))
+    delete_flag = db.Column(db.Integer, nullable=False, default=0)
+    
+    # Updated FKs to point to user_p
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    version_id = db.Column(db.Integer, nullable=False)
+    __mapper_args__ = {
+        'version_id_col': version_id
+    }
+    items = db.relationship('QuoteRequestItem', back_populates='quote_request', cascade='all, delete-orphan')
+
+event.listen(QuoteRequest, 'before_insert', before_insert_listener)
+event.listen(QuoteRequest, 'before_update', before_update_listener)
+
+class QuoteRequestItem(db.Model):
+    __tablename__ = 'quote_request_item' # Explicit naming
+    id = db.Column(db.Integer, primary_key=True)
+    quote_request_id = db.Column(db.Integer, db.ForeignKey('quote_request.id'))
+    item_line = db.Column(db.Integer)
+    material = db.Column(db.String(None))
+    vendor = db.Column(db.String(None))
+    incoterm = db.Column(db.String(None))
+    incoterm_location = db.Column(db.String(None))
+    target_price = db.Column(db.Integer)
+    note = db.Column(db.String(None))
+
+    # Updated FKs to point to user_p
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    quote_request = db.relationship('QuoteRequest', back_populates='items')
+
+    # __table_args__ = (db.UniqueConstraint('inbound_request_id', 'item_line', name='unique_inbound_request_id_item_line'),)
+
+event.listen(QuoteRequestItem, 'before_insert', before_insert_listener)
+event.listen(QuoteRequestItem, 'before_update', before_update_listener)

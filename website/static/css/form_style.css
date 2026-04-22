@@ -70,35 +70,75 @@ hr {
     padding: 4px;
 }
 
-/* --- THE FIX: Specific Column Ratios --- */
-
-/* 1. Delete/Icon Column */
-.detail-column:nth-child(1) {
-    flex: 0 0 30px; /* Does not grow or shrink, stays 30px */
-}
-
-/* 2. Short Columns (Date, Follow Up, Method) */
-/* We target the 2nd and 3rd columns specifically for dates */
+/* 1. Reset specific nth-child rules that are causing the shift */
 .detail-column:nth-child(2),
 .detail-column:nth-child(3) {
-    flex: 0 0 140px; /* Fixed width for date inputs so they don't squash */
+    flex: 1; /* Change from fixed 140px to flexible */
 }
 
-/* 3. The "Greedy" Column (Note) */
-/* This is the last column. It will take all remaining space. */
+/* 2. Set a consistent layout for both Header and Row */
+.detail-header, .detail-row {
+    display: flex;
+    width: 100%;
+    gap: 0; /* Remove gap to ensure perfect vertical alignment */
+}
+
+/* 3. Define the column widths by ratio */
+.detail-column {
+    flex: 1;         /* All columns take equal space by default */
+    min-width: 0;    /* Allows shrinking */
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+/* Specific adjustments for certain columns */
+.detail-column:nth-child(1) { 
+    flex: 0 0 40px;  /* Delete button stays small */
+}
+
+.detail-column:last-child { 
+    flex: 2;         /* The "Note" column gets double the space */
+    
+}
+
+
+/* Container for the header and rows */
+.detail-header, .detail-row {
+    display: flex;
+    width: 100%;
+    align-items: flex-start; /* Aligns items to the top */
+    gap: 10px;               /* This adds the space between your inputs */
+    margin-bottom: 5px;      /* Space between rows */
+}
+
+/* Base style for every column in the grid */
+.detail-column {
+    flex: 1;                 /* All columns take equal space by default */
+    min-width: 0;            /* Allows inputs to shrink if needed */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Specific adjustment for the Delete button column (1st column) */
+.detail-column:nth-child(1) {
+    flex: 0 0 30px;          /* Fixed small width for the minus icon */
+    align-items: center;
+    justify-content: center;
+    padding-top: 8px;        /* Centers icon vertically with inputs */
+}
+
+/* Specific adjustment for the Note column (Last column) */
 .detail-column:last-child {
-    flex: 1 1 auto; /* Grow to fill space, shrink if needed */
+    flex: 2;                 /* Gives the Note field more horizontal room */
 }
 
-/* Ensure inputs/textareas actually fill the column width provided above */
+/* Ensure all inputs fill their assigned column space */
 .detail-column input, 
 .detail-column select, 
 .detail-column textarea {
-    width: 100% !important; 
-    box-sizing: border-box; /* Includes padding in the 100% calculation */
-}
-
-.detail-column textarea {
-    min-height: 80px;
-    resize: vertical; /* Prevents the user from manually stretching the width and breaking the UI */
+    width: 100% !important;
+    box-sizing: border-box;  /* Prevents padding from breaking the width */
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }

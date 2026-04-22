@@ -1,0 +1,247 @@
+
+
+
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="{{ url_for('static', filename='js/form_common.js') }}"></script>
+<script type="text/javascript">
+    
+function addLine() {
+    var detail_section = $('div#detail-section');
+    var insertRow = $('#insert_row').clone().removeAttr('id');
+
+    var index = -1;
+    $('div.detail-row', detail_section).each(function(i, div){
+        var val = parseInt($(div).attr('index'));
+        if (val > index) index = val;
+    });
+    index++;
+
+    insertRow.attr("index", index);
+
+    // Matches the field names in your QuoteRequestItem model
+    indexingItem("material", insertRow);
+    indexingItem("vendor", insertRow);
+    indexingItem("incoterm", insertRow);
+    indexingItem("incoterm_location", insertRow);
+    indexingItem("target_price", insertRow);
+    indexingItem("note", insertRow);
+
+    detail_section.append(insertRow);
+    refInputSetup(insertRow);        
+}
+
+
+    function indexingItem(name, row) {
+        var index = row.attr("index");
+        var item_name_prefix = 'items-' + index;
+        var item = $('#' + name, row);
+        item.attr('id', item_name_prefix + "-" + item.attr('name'));
+        item.attr('name', item_name_prefix + "-" + item.attr('name'));
+    }
+
+
+    function deleteRow(obj) {
+        var row = $(obj).parent().parent();
+        row.remove();
+    }
+</script>
+
+{% include("/common/common_include.html") %}
+{% include("/common/display_errors.html") %}
+<br />
+<div align="center" class="form-group mx-sm-3 mb-2">
+    <form action="/quote_request/save" method='POST' id="quote_request_form">
+        <div align="left">
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
+        </div>
+        <br />
+        <br />
+        {{ form.hidden_tag() }}
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.requester.label }}
+                <i class="fa fa-info-circle field-info" description='Who is requesting the quote?'></i>
+            </div>
+            <div class="columninput uneditable">
+                {{ form.requester() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.customer.label }}
+                <i class="fa fa-info-circle field-info" description="Customer's name."></i>
+            </div>
+            <div class="columninput">
+                {{ form.customer() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.status.label }}
+                <i class="fa fa-info-circle field-info" description="Customer or Prospect?"></i>
+            </div>
+            <div class="columninput">
+                {{ form.status() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.location.label }}
+                <i class="fa fa-info-circle field-info" description="Where is the manuefacturing facility?"></i>
+            </div>
+            <div class="columninput">
+                {{ form.location() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.type.label }}
+                <i class="fa fa-info-circle field-info" description='Existing mode or new development?'></i>
+            </div>
+            <div class="columninput">
+                {{ form.type() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.application.label }}
+                <i class="fa fa-info-circle field-info" description="Customer's application"></i>
+            </div>
+            <div class="columninput">
+                {{ form.application() }}
+            </div>
+        </div>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.terms.label }}
+                <i class="fa fa-info-circle field-info" description='Payment terms?'></i>
+            </div>
+            <div class="columninput">
+                {{ form.terms() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.remark.label }}
+                <i class="fa fa-info-circle field-info" description='Remarks'></i>
+            </div>
+            <div class="columninput">
+                {{ form.remark() }}
+            </div>
+        </div>
+
+    
+        <hr>
+
+
+        <div align="center">
+            <input type="button" class="btn btn-primary btn-sm" onclick="addLine()" value="ADD ITEM" />
+        </div>
+        <br />
+        <div class="detail-section" id="detail-section">
+            <div class="detail-header">
+                <div class="detail-column width1" >
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.material.label }}
+                    <i class="fa fa-info-circle field-info" description="Material code"></i>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.vendor.label }}
+                    <i class="fa fa-info-circle field-info" description="Vendor name"></i>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.incoterm.label }}
+                    <i class="fa fa-info-circle field-info" description="Incoterm"></i>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.incoterm_location.label }}
+                    <i class="fa fa-info-circle field-info" description="Incoterm location"></i>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form_template.target_price.label }}
+                    <i class="fa fa-info-circle field-info" description="target_price"></i>
+                </div>
+
+                <div class="detail-column width1">
+                    {{ item_form_template.note.label }}
+                    <i class="fa fa-info-circle field-info" description="note."></i>
+                </div>
+            </div>
+            {% for item_form in form.items %}
+            <div class="detail-row" index="{{loop.index0}}">
+                <div class="detail-column width1">
+                    {{ item_form.hidden_tag() }}
+                    <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.material() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.vendor() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.incoterm() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.incoterm_location() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.target_price() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.note() }}
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+        <hr>
+
+        <br />
+        <div align="center">
+
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
+        </div>
+
+        <br />
+        <br />
+        <br />
+        <br />
+    </form>
+
+    <div style="display: none;">
+        <div class="detail-row" id="insert_row" index="">
+            <div class="detail-column width1">
+                <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
+            </div>
+
+            
+            <div class="detail-column width1">
+                {{ item_form_template.material() }}
+            </div>
+
+            <div class="detail-column width1">
+                {{ item_form_template.vendor() }}
+            </div>
+
+            <div class="detail-column width1">
+                {{ item_form_template.incoterm() }}
+            </div>
+
+            <div class="detail-column width1">
+                {{ item_form_template.incoterm_location() }}
+            </div>
+
+            <div class="detail-column width1">
+                {{ item_form_template.target_price() }}
+            </div>
+            
+            <div class="detail-column width1">
+                {{ item_form_template.note() }}
+            </div>
+
+        </div>
+    </div>
+</div>
+
+    <ul>
+    </ul>
+</div>
