@@ -1,7 +1,9 @@
-{% extends "base.html" %} {% block title %}Communication Log{% endblock %} 
+{% extends "base.html" %} 
+{% block title %}Communication Log Display{% endblock %} 
 
 {% block content %}
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/form_style.css') }}" />
+
 <script type="text/javascript">
     function deleteData() {
         if(confirm("Are you sure to delete?")) {
@@ -14,7 +16,6 @@
                 name: 'delete_id',
                 value: '{{ form.id.data }}'
             }).appendTo($form);
-
             $form.appendTo('body').submit();
         }
     }
@@ -26,386 +27,77 @@
 <br/> 
 <h2 align="center">Communication Display</h2>
 <br />
+
 <div class="form-group mx-sm-3 mb-2">
-    <div align="left">
+    <div align="left" style="margin-bottom: 20px;">
         <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/comm_log/modify/{{ form.id.data }}'">
         <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
         <input type="button" class="btn btn-primary btn-sm" value="DELETE" onclick="deleteData()">
     </div>
-</div>
-<br />
-<div class="form-group mx-sm-3 mb-2">
 
     <div class="input-container">
-        <div class="columnlabel">
-            {{ form.status.label }}
-
-        </div>
-        <div class="columninput uneditable">
-            {{ form.status.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.customer.label }}
-        </div>
-        <div class="columninput">
-            {{ form.customer.data }}
-        </div>
-    </div>
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.owner.label }}
-        </div>
-        <div class="columninput">
-            {{ form.owner.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.application.label }}
-        </div>
-        <div class="columninput">
-            {{ form.application.data }}
-        </div>
-    </div>
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.address.label }}
-        </div>
-        <div class="columninput">
-            {{ form.address.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.city.label }}
-        </div>
-        <div class="columninput">
-            {{ form.city.data }}
-        </div>
+        <div class="columnlabel">{{ form.status.label }}</div>
+        <div class="columninput">{{ form.status.data }}</div>
+        <div class="columnlabel">{{ form.customer.label }}</div>
+        <div class="columninput">{{ form.customer.data }}</div>
     </div>
 
     <div class="input-container">
-        <div class="columnlabel">
-            {{ form.state.label }}
-        </div>
-        <div class="columninput">
-            {{ form.state.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.zip.label }}
-        </div>
-        <div class="columninput">
-            {{ form.zip.data }}
-        </div>
-    </div>
-
-    <br />
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.contact1.label }}
-        </div>
-        <div class="columninput">
-            {{ form.contact1.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.title1.label }}
-        </div>
-        <div class="columninput">
-            {{ form.title1.data }}
-        </div>
+        <div class="columnlabel">{{ form.owner.label }}</div>
+        <div class="columninput">{{ form.owner.data }}</div>
+        <div class="columnlabel">{{ form.application.label }}</div>
+        <div class="columninput">{{ form.application.data }}</div>
     </div>
 
     <div class="input-container">
-        <div class="columnlabel">
-            {{ form.email1.label }}
-        </div>
-        <div class="columninput">
-            {{ form.email1.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.phone1.label }}
-        </div>
-        <div class="columninput">
-            {{ form.phone1.data }}
-        </div>
-    </div>
-
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.office1.label }}
-        </div>
-        <div class="columninput">
-            {{ form.office1.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.cnote1.label }}
-        </div>
-
-        <div class="columninput">
-            {{ form.cnote1.data }}  
-        </div>
-    </div>
-
-    <br />
-    {% if form.contact2.data %}
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.contact2.label }}
-        </div>
-        <div class="columninput">
-            {{ form.contact2.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.title2.label }}
-        </div>
-        <div class="columninput">
-            {{ form.title2.data }}
-        </div>
+        <div class="columnlabel">Location</div>
+        <div class="columninput">{{ form.address.data }} {{ form.city.data }}, {{ form.state.data }} {{ form.zip.data }}</div>
+        <div class="columnlabel">{{ form.launch_date.label }}</div>
+        <div class="columninput">{{ form.launch_date.data }}</div>
     </div>
 
     <div class="input-container">
-        <div class="columnlabel">
-            {{ form.email2.label }}
-        </div>
-        <div class="columninput">
-            {{ form.email2.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.phone2.label }}
-        </div>
-        <div class="columninput">
-            {{ form.phone2.data }}
-        </div>
+        <div class="columnlabel">{{ form.remark.label }}</div>
+        <div class="columninput">{{ form.remark.data }}</div>
     </div>
 
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.office2.label }}
-        </div>
-        <div class="columninput">
-            {{ form.office2.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.cnote2.label }}
-        </div>
-
-        <div class="columninput">
-            {{ form.cnote2.data }}  
-        </div>
-    </div>
-
-    {% endif %}
-    
-    <br />
-
-    {% if form.contact3.data %}
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.contact3.label }}
-        </div>
-        <div class="columninput">
-            {{ form.contact3.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.title3.label }}
-        </div>
-        <div class="columninput">
-            {{ form.title3.data }}
-        </div>
-    </div>
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.email3.label }}
-        </div>
-        <div class="columninput">
-            {{ form.email3.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.phone3.label }}
-        </div>
-        <div class="columninput">
-            {{ form.phone3.data }}
-        </div>
-    </div>
-
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.office3.label }}
-        </div>
-        <div class="columninput">
-            {{ form.office3.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.cnote3.label }}
-        </div>
-
-        <div class="columninput">
-            {{ form.cnote3.data }}  
-        </div>
-    </div>
-
-
-    {% endif %}
-
-    <br />
-    
-    {% if form.contact4.data %}
-
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.contact4.label }}
-        </div>
-        <div class="columninput">
-            {{ form.contact4.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.title4.label }}
-        </div>
-        <div class="columninput">
-            {{ form.title4.data }}
-        </div>
-    </div>
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.email4.label }}
-        </div>
-        <div class="columninput">
-            {{ form.email4.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.phone4.label }}
-        </div>
-        <div class="columninput">
-            {{ form.phone4.data }}
-        </div>
-    </div>
-
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.office4.label }}
-        </div>
-        <div class="columninput">
-            {{ form.office4.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.cnote4.label }}
-        </div>
-
-        <div class="columninput">
-            {{ form.cnote4.data }}  
-        </div>
-    </div>
-
-    {% endif %}
-    
-    <br />
-
-    {% if form.contact5.data %}
-
-
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.contact5.label }}
-        </div>
-        <div class="columninput">
-            {{ form.contact5.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.title5.label }}
-        </div>
-        <div class="columninput">
-            {{ form.title5.data }}
-        </div>
-    </div>
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.email5.label }}
-        </div>
-        <div class="columninput">
-            {{ form.email5.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.phone5.label }}
-        </div>
-        <div class="columninput">
-            {{ form.phone5.data }}
-        </div>
-    </div>
-
-
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.office5.label }}
-        </div>
-        <div class="columninput">
-            {{ form.office5.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.cnote5.label }}
-        </div>
-
-        <div class="columninput">
-            {{ form.cnote5.data }}  
-        </div>
-    </div>
-
-    {% endif %}
-
-    <br />
-
-    <div class="input-container">
-
-        <div class="columnlabel">
-            {{ form.launch_date.label }}
-        </div>
-        <div class="columninput">
-            {{ form.launch_date.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.remark.label }}
-        </div>
-        <div class="columninput">
-            {{ form.remark.data }}
-        </div>
-
-    </div>
-   
     <hr>
+    <h5 style="color: #4a5568; margin-left: 10px;">Primary Contact Details</h5>
+    
+    <div class="input-container">
+        <div class="columnlabel">{{ form.contact1.label }}</div>
+        <div class="columninput">{{ form.contact1.data }}</div>
+        <div class="columnlabel">{{ form.title1.label }}</div>
+        <div class="columninput">{{ form.title1.data }}</div>
+    </div>
 
+    <div class="input-container">
+        <div class="columnlabel">Contact Info</div>
+        <div class="columninput">Email: {{ form.email1.data }} | Phone: {{ form.phone1.data }}</div>
+        <div class="columnlabel">{{ form.cnote1.label }}</div>
+        <div class="columninput">{{ form.cnote1.data }}</div>
+    </div>
+
+    <br/>
+    <div class="detail-section">
+        <div class="detail-header">
+            <div class="detail-column" style="flex: 0 0 120px;">Date</div>
+            <div class="detail-column">Contact</div>
+            <div class="detail-column">Method</div>
+            <div class="detail-column" style="flex: 3;">Note</div>
+        </div>
         {% if form.items %}
-            {# UPDATED LINE BELOW #}
             {% for item_form in form.items | sort(attribute='date.data', reverse=True) %}
-                <div class="detail-row">
-                    <div class="detail-column width1">
-                        {{ item_form.date.data }}
-                    </div>
-                    <div class="detail-column width1">
-                        {{ item_form.contact.data }}
-                    </div>
-                    <div class="detail-column width1">
-                        {{ item_form.method.data }}
-                    </div>
-                    <div class="detail-column width3">
-                        {{ item_form.note.data }}
-                    </div>
-
-                </div>
+            <div class="detail-row">
+                <div class="detail-column" style="flex: 0 0 120px;">{{ item_form.date.data }}</div>
+                <div class="detail-column">{{ item_form.contact.data }}</div>
+                <div class="detail-column">{{ item_form.method.data }}</div>
+                <div class="detail-column" style="flex: 3;">{{ item_form.note.data }}</div>
+            </div>
             {% endfor %}
         {% else %}
-            <p>No items to display.</p>
+            <div class="detail-row"><div class="detail-column">No history recorded.</div></div>
         {% endif %}
-
     </div>
-
-    <hr>
-
 </div>
 {% endblock %}

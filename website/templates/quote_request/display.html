@@ -1,10 +1,12 @@
-{% extends "base.html" %} {% block title %}Quote Request{% endblock %} 
+{% extends "base.html" %} 
+{% block title %}Quote Request Display{% endblock %} 
 
 {% block content %}
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/form_style.css') }}" />
+
 <script type="text/javascript">
     function deleteData() {
-        if(confirm("Are you sure to delete?")) {
+        if(confirm("Are you sure to delete this quote request?")) {
             var $form = $('<form/>', {
                     action: '/quote_request/delete',
                     method: 'POST'
@@ -14,124 +16,70 @@
                 name: 'delete_id',
                 value: '{{ form.id.data }}'
             }).appendTo($form);
-
             $form.appendTo('body').submit();
         }
-    }
-    function createWithReference() {
-        location.href = '/quote_request/create?refer={{ form.id.data }}';
     }
 </script>
 
 <br/> 
-<h2 align="center">Quote display</h2>
+<h2 align="center">Quote Request Display</h2>
 <br />
+
 <div class="form-group mx-sm-3 mb-2">
-    <div align="left">
+    <div align="left" style="margin-bottom: 20px;">
         <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/quote_request/modify/{{ form.id.data }}'">
-        <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
         <input type="button" class="btn btn-primary btn-sm" value="DELETE" onclick="deleteData()">
     </div>
-</div>
-<br />
-<div class="form-group mx-sm-3 mb-2">
 
     <div class="input-container">
-        <div class="columnlabel">
-            {{ form.requester.label }}
-
-        </div>
-        <div class="columninput uneditable">
-            {{ form.requester.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.customer.label }}
-        </div>
-        <div class="columninput">
-            {{ form.customer.data }}
-        </div>
-    </div>
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.status.label }}
-        </div>
-        <div class="columninput">
-            {{ form.status.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.location.label }}
-        </div>
-        <div class="columninput">
-            {{ form.location.data }}
-        </div>
-    </div>
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.type.label }}
-        </div>
-        <div class="columninput">
-            {{ form.type.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.application.label }}
-        </div>
-        <div class="columninput">
-            {{ form.application.data }}
-        </div>
+        <div class="columnlabel">{{ form.requester.label }}</div>
+        <div class="columninput">{{ form.requester.data }}</div>
+        <div class="columnlabel">{{ form.customer.label }}</div>
+        <div class="columninput">{{ form.customer.data }}</div>
     </div>
 
     <div class="input-container">
-        <div class="columnlabel">
-            {{ form.terms.label }}
-        </div>
-        <div class="columninput">
-            {{ form.terms.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.remark.label }}
-        </div>
-        <div class="columninput">
-            {{ form.remark.data }}
-        </div>
-    </div>
-   
-    <hr>
-
-        {% if form.items %}
-            {# UPDATED LINE BELOW #}
-            {% for item_form in form.items  %}
-                <div class="detail-row">
-                    <div class="detail-column width1">
-                        {{ item_form.material.data }}
-                    </div>
-                    <div class="detail-column width1">
-                        {{ item_form.vendor.data }}
-                    </div>
-                    <div class="detail-column width1">
-                        {{ item_form.incoterm.data }}
-                    </div>
-
-                    <div class="detail-column width1">
-                        {{ item_form.incoterm_location.data }}
-                    </div>
-
-                    <div class="detail-column width1">
-                        {{ item_form.target_price.data }}
-                    </div>
-
-                    <div class="detail-column width3">
-                        {{ item_form.note.data }}
-                    </div>
-
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No items to display.</p>
-        {% endif %}
-
+        <div class="columnlabel">{{ form.status.label }}</div>
+        <div class="columninput">{{ form.status.data }}</div>
+        <div class="columnlabel">{{ form.location.label }}</div>
+        <div class="columninput">{{ form.location.data }}</div>
     </div>
 
-    <hr>
+    <div class="input-container">
+        <div class="columnlabel">{{ form.type.label }}</div>
+        <div class="columninput">{{ form.type.data }}</div>
+        <div class="columnlabel">{{ form.application.label }}</div>
+        <div class="columninput">{{ form.application.data }}</div>
+    </div>
 
+    <div class="input-container">
+        <div class="columnlabel">{{ form.terms.label }}</div>
+        <div class="columninput">{{ form.terms.data }}</div>
+        <div class="columnlabel">{{ form.remark.label }}</div>
+        <div class="columninput">{{ form.remark.data }}</div>
+    </div>
+
+    <br/>
+    <h5 style="color: #4a5568; margin-left: 10px;">Requested Materials</h5>
+    <div class="detail-section">
+        <div class="detail-header">
+            <div class="detail-column" style="flex: 0 0 50px;">#</div>
+            <div class="detail-column">Material</div>
+            <div class="detail-column">Vendor</div>
+            <div class="detail-column">Incoterm</div>
+            <div class="detail-column">Target Price</div>
+            <div class="detail-column" style="flex: 2;">Note</div>
+        </div>
+        {% for item in form.items %}
+        <div class="detail-row">
+            <div class="detail-column" style="flex: 0 0 50px;">{{ item.item_line.data }}</div>
+            <div class="detail-column">{{ item.material.data }}</div>
+            <div class="detail-column">{{ item.vendor.data }}</div>
+            <div class="detail-column">{{ item.incoterm.data }} - {{ item.incoterm_location.data }}</div>
+            <div class="detail-column">${{ item.target_price.data }}</div>
+            <div class="detail-column" style="flex: 2;">{{ item.note.data }}</div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}

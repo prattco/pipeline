@@ -91,9 +91,18 @@ hr {
     box-sizing: border-box;
 }
 
-/* Specific adjustments for certain columns */
+/* Update the first column (Date) to have enough room */
 .detail-column:nth-child(1) { 
-    flex: 0 0 40px;  /* Delete button stays small */
+    flex: 0 0 100px;  /* Set a fixed width for the date (approx 100px) */
+    min-width: 100px; /* Prevent it from shrinking */
+    white-space: nowrap; /* Keep the date on one line */
+    font-weight: 600;    /* Optional: make it look more organized */
+    color: #4a5568;      /* Match your new color scheme */
+}
+
+/* Ensure the Note column (the 3rd column) still takes up the most space */
+.detail-column:nth-child(3) { 
+    flex: 3; 
 }
 
 .detail-column:last-child { 
