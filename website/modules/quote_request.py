@@ -44,8 +44,8 @@ def do_quote_request_index():
                 'terms': quote_request.terms.strip() if quote_request.terms else "",
                 'remark': quote_request.remark.strip() if quote_request.remark else "",
 
-                'created_date': quote_request.created_date.strftime('%Y-%m-%d %H:%M') if quote_request.created_date else "",
-                'updated_date': quote_request.updated_date.strftime('%Y-%m-%d %H:%M') if quote_request.updated_date else ""
+                # 'created_date': quote_request.created_date.strftime('%Y-%m-%d %H:%M') if quote_request.created_date else "",
+                # 'updated_date': quote_request.updated_date.strftime('%Y-%m-%d %H:%M') if quote_request.updated_date else "",
             }
             quote_request_list.append(quote_request_data)
 
@@ -119,12 +119,14 @@ def do_quote_request_display(id):
         else:
             flash('You are not authorized', category='error')
             return redirect('/')
-        
+
+        # quote_request_obj = getQuoteRequest(id) # Retrieve the model object
         quote_request = getQuoteRequest(id)
         form = QuoteRequestForm(obj=quote_request)
         item_form = QuoteRequestItemForm()
 
-        return render_template("quote_request/display.html", user=current_user, form=form, item_form=item_form)
+        return render_template("quote_request/display.html", user=current_user, form=form, item_form=item_form, quote_request=quote_request)
+
     except Exception as e:
         print(f"Error in do_quote_request_display: {e}")
         abort(500)

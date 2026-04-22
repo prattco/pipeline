@@ -6,7 +6,7 @@
 
 <script type="text/javascript">
     function deleteData() {
-        if(confirm("Are you sure to delete this quote request?")) {
+        if(confirm("Are you sure to delete?")) {
             var $form = $('<form/>', {
                     action: '/quote_request/delete',
                     method: 'POST'
@@ -19,7 +19,12 @@
             $form.appendTo('body').submit();
         }
     }
+    function createWithReference() {
+        location.href = '/quote_request/create?refer={{ form.id.data }}';
+    }
 </script>
+
+
 
 <br/> 
 <h2 align="center">Quote Request Display</h2>
@@ -28,6 +33,7 @@
 <div class="form-group mx-sm-3 mb-2">
     <div align="left" style="margin-bottom: 20px;">
         <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/quote_request/modify/{{ form.id.data }}'">
+        <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
         <input type="button" class="btn btn-primary btn-sm" value="DELETE" onclick="deleteData()">
     </div>
 
@@ -57,6 +63,13 @@
         <div class="columninput">{{ form.terms.data }}</div>
         <div class="columnlabel">{{ form.remark.label }}</div>
         <div class="columninput">{{ form.remark.data }}</div>
+    </div>
+
+    <div class="input-container">
+        <div class="columnlabel">Created Date</div>
+        <div class="columninput">{{ quote_request.created_date.strftime('%Y-%m-%d %H:%M') if quote_request.created_date else "" }}</div>
+        <div class="columnlabel">Updated Date</div>
+        <div class="columninput">{{ quote_request.updated_date.strftime('%Y-%m-%d %H:%M') if quote_request.updated_date else "" }}</div>
     </div>
 
     <br/>
