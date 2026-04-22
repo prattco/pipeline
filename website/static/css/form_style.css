@@ -142,3 +142,113 @@ hr {
     border: 1px solid #ccc;
     border-radius: 4px;
 }
+
+
+/* --- Modernized Display Layout --- */
+
+/* Container for the whole form area */
+.form-group {
+    max-width: 1100px;
+    margin: 0 auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+/* Horizontal Row Styling */
+.input-container {
+    display: flex;
+    flex-wrap: wrap;
+    border-bottom: 1px solid #edf2f7; /* Light divider between rows */
+    align-items: stretch;
+}
+
+.input-container:last-of-type {
+    border-bottom: none;
+}
+
+/* Label Styling: Gray background to distinguish from data */
+.columnlabel {
+    flex: 0 0 160px; 
+    background-color: #f8fafc;
+    color: #4a5568;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    padding: 12px 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+}
+
+/* Data/Value Styling */
+.columninput {
+    flex: 1;
+    min-width: 200px;
+    padding: 12px 15px;
+    color: #2d3748;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    background-color: #ffffff;
+}
+
+/* Specific fix for multi-column rows on mobile */
+@media (max-width: 768px) {
+    .columnlabel { flex: 0 0 100%; border-bottom: none; }
+    .columninput { flex: 0 0 100%; border-bottom: 1px solid #edf2f7; }
+}
+
+/* --- Detail Section (The Bottom Table) --- */
+
+.detail-section {
+    margin-top: 20px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.detail-header {
+    background-color: #4a5568; /* Dark Header */
+    color: #ffffff;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.detail-row {
+    border-bottom: 1px solid #e2e8f0;
+    transition: background 0.2s;
+}
+
+.detail-row:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+.detail-row:hover {
+    background-color: #edf2f7; /* Subtle hover effect */
+}
+
+.detail-column {
+    padding: 12px 15px;
+}
+
+/* --- Button Styling Enhancements --- */
+.btn-primary {
+    background-color: #3182ce;
+    border: none;
+    font-weight: 600;
+    padding: 8px 16px;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #2b6cb0;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+hr {
+    border-top: 2px solid #e2e8f0;
+    margin: 30px 0;
+}
