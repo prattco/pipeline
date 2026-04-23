@@ -344,7 +344,7 @@
             paging: true,
             searching: true,
             ordering: true,
-            order: [[0, 'asc']], 
+            order: [[41, 'desc']], 
             pageLength: 100,
             autoWidth: false, 
             // columnDefs: [
@@ -383,7 +383,7 @@
     
         // Default Status filter (Index 0)
         const statusColumnIndex = 0; 
-        const defaultStatusFilterValue = 'Active'; 
+        const defaultStatusFilterValue = ''; 
     
         $(`.filter-input[data-column="${statusColumnIndex}"]`).val(defaultStatusFilterValue);
         var filterValues = defaultStatusFilterValue.split(',').map(item => item.trim());

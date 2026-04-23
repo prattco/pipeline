@@ -43,6 +43,8 @@ def do_quote_request_index():
                 'application': quote_request.application.strip() if quote_request.application else "",
                 'terms': quote_request.terms.strip() if quote_request.terms else "",
                 'remark': quote_request.remark.strip() if quote_request.remark else "",
+                'created_date': quote_request.created_date,
+                'updated_date': quote_request.updated_date,
 
                 # 'created_date': quote_request.created_date.strftime('%Y-%m-%d %H:%M') if quote_request.created_date else "",
                 # 'updated_date': quote_request.updated_date.strftime('%Y-%m-%d %H:%M') if quote_request.updated_date else "",
@@ -263,3 +265,18 @@ def saveAction(form):
         db.session.rollback()
         abort(500)
 
+@quote_request.route('/quote_request/delete', methods=['POST'])
+@login_required
+def do_quote_request_delete():
+    try:
+        id = request.form["delete_id"]
+        quote_request = getQuoteRequest(id)
+        quote_request.delete_flag = 1
+        db.session.add(quote_request)
+        db.session.commit()
+        flash("Project is deleted", category="success")
+        return redirect("/quote_request/list")
+    except Exception as e:
+        print(f"Error in do_quote_request_delete: {e}")
+        db.session.rollback()
+        abort(500)

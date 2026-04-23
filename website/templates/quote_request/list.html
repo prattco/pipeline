@@ -100,13 +100,18 @@
                 <td>
                     {{ quote_request.remark }}
                 </td>
-
-
-                <td>
+                <!-- <td>
                     {{ quote_request.created_date }}
                 </td>
                 <td>
                     {{ quote_request.updated_date }}
+                </td> -->
+
+                <td>
+                    {{ quote_request.created_date.strftime('%Y-%m-%d %H:%M') if quote_request.created_date else "" }}
+                </td>
+                <td>
+                    {{ quote_request.updated_date.strftime('%Y-%m-%d %H:%M') if quote_request.updated_date else "" }}
                 </td>
 
 
@@ -130,7 +135,7 @@
             paging: true,
             searching: true,
             ordering: true,
-            order: [[0, 'asc']], 
+            order: [[8, 'desc']], 
             pageLength: 100,
             autoWidth: false, 
             // columnDefs: [
@@ -143,7 +148,8 @@
             // ],
             responsive: true
         });
-    
+
+
         // Initialize Select2
         $('#column-selector').select2({
             placeholder: "Select columns",
