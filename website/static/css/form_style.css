@@ -1,161 +1,4 @@
-/* --- General Input Fixes --- */
-.columninput input, 
-.columninput select, 
-.columninput textarea {
-    width: 100%; /* Fill the container */
-    max-width: 250px; /* Limits size in the top section */
-    box-sizing: border-box;
-}
-
-.columninput textarea {
-    min-height: 80px;
-    resize: vertical;
-}
-
-
-/* --- Layout Containers --- */
-.input-container {
-    display: flex;
-    flex-wrap: wrap;
-    margin-bottom: 10px;
-}
-
-.columnlabel {
-    flex: 0 0 150px; /* Labels get a consistent width */
-    font-weight: bold;
-    padding: 5px;
-}
-
-.columninput {
-    flex: 1;
-    min-width: 200px;
-    padding: 5px;
-}
-
-/* --- Utility Classes --- */
-hr {
-    border: 0;
-    border-top: 1.5px solid #555;
-    margin: 20px 0;
-}
-
-.tooltipbox {
-    display: none;
-    position: absolute;
-    background: #f7f7f7;
-    border: 1px solid #ccc;
-    padding: 5px;
-    z-index: 1000;
-}
-
-
-
-/* Ensure the container can handle the width */
-.detail-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.detail-header, .detail-row {
-    display: flex;
-    width: 100%;
-    align-items: flex-start; /* Keeps inputs aligned to top even if Note grows tall */
-    gap: 5px; /* Adds a small consistent gap between columns */
-}
-
-/* Base style for all columns */
-.detail-column {
-    min-width: 0; /* CRITICAL: This allows the column to shrink smaller than the input inside it */
-    padding: 4px;
-}
-
-/* 1. Reset specific nth-child rules that are causing the shift */
-.detail-column:nth-child(2),
-.detail-column:nth-child(3) {
-    flex: 1; /* Change from fixed 140px to flexible */
-}
-
-/* 2. Set a consistent layout for both Header and Row */
-.detail-header, .detail-row {
-    display: flex;
-    width: 100%;
-    gap: 0; /* Remove gap to ensure perfect vertical alignment */
-}
-
-/* 3. Define the column widths by ratio */
-.detail-column {
-    flex: 1;         /* All columns take equal space by default */
-    min-width: 0;    /* Allows shrinking */
-    padding: 5px;
-    box-sizing: border-box;
-}
-
-/* Update the first column (Date) to have enough room */
-.detail-column:nth-child(1) { 
-    flex: 0 0 100px;  /* Set a fixed width for the date (approx 100px) */
-    min-width: 100px; /* Prevent it from shrinking */
-    white-space: nowrap; /* Keep the date on one line */
-    font-weight: 600;    /* Optional: make it look more organized */
-    color: #4a5568;      /* Match your new color scheme */
-}
-
-/* Ensure the Note column (the 3rd column) still takes up the most space */
-.detail-column:nth-child(3) { 
-    flex: 3; 
-}
-
-.detail-column:last-child { 
-    flex: 2;         /* The "Note" column gets double the space */
-    
-}
-
-
-/* Container for the header and rows */
-.detail-header, .detail-row {
-    display: flex;
-    width: 100%;
-    align-items: flex-start; /* Aligns items to the top */
-    gap: 10px;               /* This adds the space between your inputs */
-    margin-bottom: 5px;      /* Space between rows */
-}
-
-/* Base style for every column in the grid */
-.detail-column {
-    flex: 1;                 /* All columns take equal space by default */
-    min-width: 0;            /* Allows inputs to shrink if needed */
-    display: flex;
-    flex-direction: column;
-}
-
-/* Specific adjustment for the Delete button column (1st column) */
-.detail-column:nth-child(1) {
-    flex: 0 0 30px;          /* Fixed small width for the minus icon */
-    align-items: center;
-    justify-content: center;
-    padding-top: 8px;        /* Centers icon vertically with inputs */
-}
-
-/* Specific adjustment for the Note column (Last column) */
-.detail-column:last-child {
-    flex: 2;                 /* Gives the Note field more horizontal room */
-}
-
-/* Ensure all inputs fill their assigned column space */
-.detail-column input, 
-.detail-column select, 
-.detail-column textarea {
-    width: 100% !important;
-    box-sizing: border-box;  /* Prevents padding from breaking the width */
-    padding: 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-
-/* --- Modernized Display Layout --- */
-
-/* Container for the whole form area */
+/* --- Global Container & Input Styling --- */
 .form-group {
     max-width: 1100px;
     margin: 0 auto;
@@ -165,11 +8,23 @@ hr {
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-/* Horizontal Row Styling */
+/* Ensure inputs fill their containers but don't get absurdly wide in the top section */
+.columninput input, 
+.columninput select, 
+.columninput textarea {
+    width: 100%;
+    max-width: 350px;
+    box-sizing: border-box;
+    padding: 8px;
+    border: 1px solid #cbd5e0;
+    border-radius: 4px;
+}
+
+/* --- Top Section (Header Information) --- */
 .input-container {
     display: flex;
     flex-wrap: wrap;
-    border-bottom: 1px solid #edf2f7; /* Light divider between rows */
+    border-bottom: 1px solid #edf2f7;
     align-items: stretch;
 }
 
@@ -177,7 +32,6 @@ hr {
     border-bottom: none;
 }
 
-/* Label Styling: Gray background to distinguish from data */
 .columnlabel {
     flex: 0 0 160px; 
     background-color: #f8fafc;
@@ -191,7 +45,6 @@ hr {
     align-items: center;
 }
 
-/* Data/Value Styling */
 .columninput {
     flex: 1;
     min-width: 200px;
@@ -202,62 +55,109 @@ hr {
     background-color: #ffffff;
 }
 
-/* Specific fix for multi-column rows on mobile */
-@media (max-width: 768px) {
-    .columnlabel { flex: 0 0 100%; border-bottom: none; }
-    .columninput { flex: 0 0 100%; border-bottom: 1px solid #edf2f7; }
-}
-
-/* --- Detail Section (The Bottom Table) --- */
-
+/* --- Detail Section (Materials & Claim Items Table) --- */
 .detail-section {
     margin-top: 20px;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-header, .detail-row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .detail-header {
-    background-color: #4a5568; /* Dark Header */
+    background-color: #4a5568;
     color: #ffffff;
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
-.detail-row {
-    border-bottom: 1px solid #e2e8f0;
-    transition: background 0.2s;
-}
-
-.detail-row:nth-child(even) {
-    background-color: #f8fafc;
-}
-
-.detail-row:hover {
-    background-color: #edf2f7; /* Subtle hover effect */
-}
+.detail-row:nth-child(even) { background-color: #f8fafc; }
+.detail-row:hover { background-color: #edf2f7; }
 
 .detail-column {
-    padding: 12px 15px;
+    padding: 12px 10px;
+    flex: 1; /* Default growth for middle columns */
+    min-width: 0;
+    box-sizing: border-box;
 }
 
-/* --- Button Styling Enhancements --- */
+/* --- Shared Column Width Logic (Applied to both forms) --- */
+
+/* 1. Action Column (Delete Button / Index) */
+.detail-column:nth-child(1) {
+    flex: 0 0 50px; 
+    text-align: center;
+}
+
+/* 2. Date / Material Columns */
+.detail-column:nth-child(2) {
+    flex: 1.2; 
+}
+
+/* 3. EAU / Follow Up Columns */
+/* Narrowed for EAU in Quote Form, balanced for Date in Quality Form */
+.detail-column:nth-child(3) {
+    flex: 0.8; 
+    min-width: 80px;
+}
+
+/* 4. Vendor / Note Columns */
+.detail-column:nth-child(4) {
+    flex: 1.5;
+}
+
+/* 5. Incoterm / Note (Longer text areas) */
+.detail-column:last-child {
+    flex: 3; /* Always give the last column (usually Note) the most space */
+}
+
+/* Ensure inputs inside table fit perfectly */
+.detail-column input, 
+.detail-column select,
+.detail-column textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 6px;
+}
+
+/* --- Button Styling --- */
 .btn-primary {
     background-color: #3182ce;
     border: none;
     font-weight: 600;
     padding: 8px 16px;
-    transition: all 0.2s;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
 .btn-primary:hover {
     background-color: #2b6cb0;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
+/* --- Utilities --- */
 hr {
+    border: 0;
     border-top: 2px solid #e2e8f0;
     margin: 30px 0;
+}
+
+.field-info {
+    margin-left: 5px;
+    color: #a0aec0;
+    cursor: help;
+}
+
+@media (max-width: 768px) {
+    .columnlabel, .columninput { flex: 0 0 100%; }
 }

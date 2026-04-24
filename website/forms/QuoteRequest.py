@@ -16,6 +16,7 @@ class QuoteRequestItemForm(FlaskForm):
     quote_request_id = HiddenField()
     item_line = IntegerField("Item Line")
     material = StringField("Material",validators=[DataRequired()])
+    eau = IntegerField("EAU")
     vendor = StringField("Vendor",validators=[DataRequired()])
     incoterm = StringField("Incoterm",validators=[DataRequired()])
     incoterm_location = StringField("Incoterm Location",validators=[DataRequired()])

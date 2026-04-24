@@ -78,6 +78,7 @@
         <div class="detail-header">
             <div class="detail-column" style="flex: 0 0 50px;">#</div>
             <div class="detail-column">Material</div>
+            <div class="detail-column">EAU</div>
             <div class="detail-column">Vendor</div>
             <div class="detail-column">Incoterm</div>
             <div class="detail-column">Target Price</div>
@@ -87,6 +88,7 @@
         <div class="detail-row">
             <div class="detail-column" style="flex: 0 0 50px;">{{ item.item_line.data }}</div>
             <div class="detail-column">{{ item.material.data }}</div>
+            <div class="detail-column">{{ item.eau.data }}</div>
             <div class="detail-column">{{ item.vendor.data }}</div>
             <div class="detail-column">{{ item.incoterm.data }} - {{ item.incoterm_location.data }}</div>
             <div class="detail-column">${{ item.target_price.data }}</div>

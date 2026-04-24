@@ -141,6 +141,10 @@ function addLine() {
                     <i class="fa fa-info-circle field-info" description="Material code"></i>
                 </div>
                 <div class="detail-column width1">
+                    {{ item_form_template.eau.label }}
+                    <i class="fa fa-info-circle field-info" description="Estimated Annual Usage"></i>
+                </div>
+                <div class="detail-column width1">
                     {{ item_form_template.vendor.label }}
                     <i class="fa fa-info-circle field-info" description="Vendor name"></i>
                 </div>
@@ -170,6 +174,9 @@ function addLine() {
                 </div>
                 <div class="detail-column width1">
                     {{ item_form.material() }}
+                </div>
+                <div class="detail-column width1">
+                    {{ item_form.eau() }}
                 </div>
                 <div class="detail-column width1">
                     {{ item_form.vendor() }}
@@ -216,6 +223,9 @@ function addLine() {
             
             <div class="detail-column width1">
                 {{ item_form_template.material() }}
+            </div>
+            <div class="detail-column width1">
+                {{ item_form_template.eau() }}
             </div>
 
             <div class="detail-column width1">

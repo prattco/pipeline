@@ -291,6 +291,7 @@ class QuoteRequestItem(db.Model):
     quote_request_id = db.Column(db.Integer, db.ForeignKey('quote_request.id'))
     item_line = db.Column(db.Integer)
     material = db.Column(db.String(None))
+    eau = db.Column(db.Integer)
     vendor = db.Column(db.String(None))
     incoterm = db.Column(db.String(None))
     incoterm_location = db.Column(db.String(None))
