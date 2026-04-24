@@ -19,7 +19,7 @@ class QuoteRequestItemForm(FlaskForm):
     eau = IntegerField("EAU")
     vendor = StringField("Vendor",validators=[DataRequired()])
     incoterm = StringField("Incoterm",validators=[DataRequired()])
-    incoterm_location = StringField("Incoterm Location",validators=[DataRequired()])
+    incoterm_location = StringField("Location",validators=[DataRequired()])
     target_price = IntegerField("Target Price",validators=[DataRequired()])
     note = TextAreaField("Note")
 
