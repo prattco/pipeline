@@ -295,7 +295,7 @@ class QuoteRequestItem(db.Model):
     vendor = db.Column(db.String(None))
     incoterm = db.Column(db.String(None))
     incoterm_location = db.Column(db.String(None))
-    target_price = db.Column(db.Integer)
+    target_price = db.Column(db.Float)
     note = db.Column(db.String(None))
 
     # Updated FKs to point to user_p

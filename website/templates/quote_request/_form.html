@@ -34,13 +34,29 @@ function addLine() {
 }
 
 
+    // function indexingItem(name, row) {
+    //     var index = row.attr("index");
+    //     var item_name_prefix = 'items-' + index;
+    //     var item = $('#' + name, row);
+    //     item.attr('id', item_name_prefix + "-" + item.attr('name'));
+    //     item.attr('name', item_name_prefix + "-" + item.attr('name'));
+    // }
+
+
+    // FIXED CODE
     function indexingItem(name, row) {
         var index = row.attr("index");
-        var item_name_prefix = 'items-' + index;
+        var item_name_prefix = 'items-' + index; 
         var item = $('#' + name, row);
-        item.attr('id', item_name_prefix + "-" + item.attr('name'));
-        item.attr('name', item_name_prefix + "-" + item.attr('name'));
+        
+        // Flask-WTF FieldList expects: items-0-target_price
+        // Note: ensure the template's 'name' attribute is just the field name (e.g., 'target_price')
+        var fieldName = item.attr('name'); 
+        
+        item.attr('id', item_name_prefix + '-' + fieldName);
+        item.attr('name', item_name_prefix + '-' + fieldName);
     }
+
 
 
     function deleteRow(obj) {

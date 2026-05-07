@@ -5,7 +5,7 @@ from flask_login import current_user
 from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, Optional
 from wtforms.fields import html5
-from wtforms import HiddenField, IntegerField, StringField, BooleanField, SelectField, TextAreaField, FieldList, FormField, validators, ValidationError
+from wtforms import HiddenField, IntegerField, StringField, BooleanField, SelectField, TextAreaField, FieldList, FormField, validators, ValidationError, DecimalField
 from .. import db
 from sqlalchemy import text
 
@@ -20,7 +20,7 @@ class QuoteRequestItemForm(FlaskForm):
     vendor = StringField("Vendor",validators=[DataRequired()])
     incoterm = StringField("Price Term",validators=[DataRequired()])
     incoterm_location = StringField("Location",validators=[DataRequired()])
-    target_price = IntegerField("Target Price",validators=[DataRequired()])
+    target_price = DecimalField("Target Price",validators=[DataRequired()])
     note = TextAreaField("Note")
 
     class Meta:
