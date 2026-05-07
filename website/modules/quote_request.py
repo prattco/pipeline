@@ -212,9 +212,43 @@ def do_quote_request_save():
         errorForm(form)
         return redirect_back()
 
-def sendNotification():
+# def sendNotification():
+#     EMAIL_FROM = "no-reply@chicagolandcfs.com"
+#     # 1. Define the list of recipients
+#     RECIPIENTS = ["danny.yun@prattco.com", "david.jeon@prattco.com"]
+    
+#     SMTP_SERVER = "smtp.office365.com"
+#     SMTP_PORT = 587
+#     SMTP_USERNAME = 'no-reply@chicagolandcfs.com'
+#     SMTP_PASSWORD = 'NReply@1418'
+
+#     # Create the plain HTML message
+#     body = '<h3>New price request is submitted.</h3><br/><p>Please check the system for details.</p>'
+#     msg = MIMEText(body, "html")
+    
+#     msg['Subject'] = 'Price Request'
+#     msg['From'] = EMAIL_FROM
+#     # 2. Join the list into a single string for the header: "email1, email2"
+#     msg['To'] = ", ".join(RECIPIENTS)
+
+#     try:
+#         # Establish connection
+#         smtp_obj = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+#         smtp_obj.starttls()
+        
+#         # Login and send
+#         smtp_obj.login(SMTP_USERNAME, SMTP_PASSWORD)
+        
+#         # 3. Use the list of recipients here so the server knows everyone to deliver to
+#         smtp_obj.sendmail(EMAIL_FROM, RECIPIENTS, msg.as_string())
+        
+#         smtp_obj.quit()
+#         print("Notification sent successfully to all recipients.")
+#     except Exception as e:
+#         print(f"Failed to send email: {e}")
+
+def sendNotification(obj):
     EMAIL_FROM = "no-reply@chicagolandcfs.com"
-    # 1. Define the list of recipients
     RECIPIENTS = ["danny.yun@prattco.com", "david.jeon@prattco.com"]
     
     SMTP_SERVER = "smtp.office365.com"
@@ -222,32 +256,36 @@ def sendNotification():
     SMTP_USERNAME = 'no-reply@chicagolandcfs.com'
     SMTP_PASSWORD = 'NReply@1418'
 
-    # Create the plain HTML message
-    body = '<h3>New price request is submitted.</h3><br/><p>Please check the system for details.</p>'
-    msg = MIMEText(body, "html")
+    # --- Formatting the Body ---
+    # Create a list of strings: "'Material Name' from line X"
+    material_list = [f"'{item.material}'" for item in obj.items]
     
-    msg['Subject'] = 'Price Request'
+    # Join them with commas
+    materials_string = ", ".join(material_list)
+    
+    # Build the final sentence
+    summary_text = f"'{obj.requester}' submitted price request for {materials_string} for '{obj.customer}'."
+
+    body = f"""
+    <p>{summary_text}</p>
+    <p>Please check the system for details.</p>
+    """
+    # ---------------------------
+
+    msg = MIMEText(body, "html")
+    msg['Subject'] = f'Price Request: {obj.customer}'
     msg['From'] = EMAIL_FROM
-    # 2. Join the list into a single string for the header: "email1, email2"
     msg['To'] = ", ".join(RECIPIENTS)
 
     try:
-        # Establish connection
         smtp_obj = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         smtp_obj.starttls()
-        
-        # Login and send
         smtp_obj.login(SMTP_USERNAME, SMTP_PASSWORD)
-        
-        # 3. Use the list of recipients here so the server knows everyone to deliver to
         smtp_obj.sendmail(EMAIL_FROM, RECIPIENTS, msg.as_string())
-        
         smtp_obj.quit()
-        print("Notification sent successfully to all recipients.")
+        print("Notification sent successfully.")
     except Exception as e:
         print(f"Failed to send email: {e}")
-
-
 
 def saveAction(form):
     try:
@@ -306,7 +344,8 @@ def saveAction(form):
         db.session.commit()
         
         # Run the function
-        sendNotification()
+        # sendNotification()
+        sendNotification(quote_request_obj)
 
         return str(quote_request_obj.id)
     except Exception as e:
