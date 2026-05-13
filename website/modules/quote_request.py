@@ -254,7 +254,7 @@ def sendNotification(obj):
 # 2. Add the user who created the request if they exist
     # Note: Replace 'created_user' with the actual attribute name in your model
     if hasattr(obj, 'created_user') and obj.created_user:
-        RECIPIENTS.append(obj.created_user)    
+        RECIPIENTS.append(str(obj.created_user))    
 
     SMTP_SERVER = "smtp.office365.com"
     SMTP_PORT = 587
@@ -263,8 +263,8 @@ def sendNotification(obj):
 
     # --- Formatting the Body ---
     # Create a list of strings: "'Material Name' from line X"
-    material_list = [f"'{item.material}'" for item in obj.items]
-    
+    # material_list = [f"'{item.material}'" for item in obj.items]
+    material_list = [f"'{str(item.material)}'" for item in obj.items]
     # Join them with commas
     materials_string = ", ".join(material_list)
     
