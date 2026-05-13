@@ -11,6 +11,7 @@ from .. import db
 from ..forms.QuoteRequest import QuoteRequestForm, QuoteRequestItemForm
 from ..lib.Extensions import prepareForm, errorForm, redirect_back, createWithReference
 
+from datetime import timedelta # Add this to your imports at the top
 
 
 from email.mime.multipart import MIMEMultipart
@@ -38,8 +39,16 @@ def do_quote_request_index():
         # Use joinedload to prevent N+1 query issues if necessary
         quote_requests = QuoteRequest.query.filter(QuoteRequest.delete_flag != 1).order_by(desc(QuoteRequest.id)).all()
 
+        # Define the offset (e.g., -5 hours for Central Daylight Time)
+        # Change to -6 for standard winter time
+        cst_offset = timedelta(hours=-5)
+
         quote_request_list = []
         for quote_request in quote_requests:
+
+            # Apply offset safely
+            c_date = quote_request.created_date + cst_offset if quote_request.created_date else None
+            u_date = quote_request.updated_date + cst_offset if quote_request.updated_date else None
 
             quote_request_data = {
                 'id': quote_request.id,
@@ -52,9 +61,11 @@ def do_quote_request_index():
                 'application': quote_request.application.strip() if quote_request.application else "",
                 'terms': quote_request.terms.strip() if quote_request.terms else "",
                 'remark': quote_request.remark.strip() if quote_request.remark else "",
-                'created_date': quote_request.created_date,
-                'updated_date': quote_request.updated_date,
-
+                # 'created_date': quote_request.created_date,
+                # 'updated_date': quote_request.updated_date,
+                # Pass the adjusted dates
+                'created_date': c_date,
+                'updated_date': u_date,
                 # 'created_date': quote_request.created_date.strftime('%Y-%m-%d %H:%M') if quote_request.created_date else "",
                 # 'updated_date': quote_request.updated_date.strftime('%Y-%m-%d %H:%M') if quote_request.updated_date else "",
             }
@@ -247,7 +258,7 @@ def sendNotification(obj, is_new=True):
         user_display_name = current_user.email.split('@')[0]
     else:
         user_display_name = obj.requester
-            
+
     action_verb = "submitted a new" if is_new else "updated the"
 
     # Build the final sentence
