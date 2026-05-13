@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 import re
 
 # Adjust these imports to match your folder structure if needed
-from ..models import QuoteRequest, QuoteRequestItem  
+from ..models import QuoteRequest, QuoteRequestItem, User  
 from .. import db 
 from ..forms.QuoteRequest import QuoteRequestForm, QuoteRequestItemForm
 from ..lib.Extensions import prepareForm, errorForm, redirect_back, createWithReference
@@ -212,64 +212,50 @@ def do_quote_request_save():
         errorForm(form)
         return redirect_back()
 
-# def sendNotification():
-#     EMAIL_FROM = "no-reply@chicagolandcfs.com"
-#     # 1. Define the list of recipients
-#     RECIPIENTS = ["danny.yun@prattco.com", "david.jeon@prattco.com"]
-    
-#     SMTP_SERVER = "smtp.office365.com"
-#     SMTP_PORT = 587
-#     SMTP_USERNAME = 'no-reply@chicagolandcfs.com'
-#     SMTP_PASSWORD = 'NReply@1418'
-
-#     # Create the plain HTML message
-#     body = '<h3>New price request is submitted.</h3><br/><p>Please check the system for details.</p>'
-#     msg = MIMEText(body, "html")
-    
-#     msg['Subject'] = 'Price Request'
-#     msg['From'] = EMAIL_FROM
-#     # 2. Join the list into a single string for the header: "email1, email2"
-#     msg['To'] = ", ".join(RECIPIENTS)
-
-#     try:
-#         # Establish connection
-#         smtp_obj = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-#         smtp_obj.starttls()
-        
-#         # Login and send
-#         smtp_obj.login(SMTP_USERNAME, SMTP_PASSWORD)
-        
-#         # 3. Use the list of recipients here so the server knows everyone to deliver to
-#         smtp_obj.sendmail(EMAIL_FROM, RECIPIENTS, msg.as_string())
-        
-#         smtp_obj.quit()
-#         print("Notification sent successfully to all recipients.")
-#     except Exception as e:
-#         print(f"Failed to send email: {e}")
-
-def sendNotification(obj):
+def sendNotification(obj, is_new=True):
     EMAIL_FROM = "no-reply@chicagolandcfs.com"
     RECIPIENTS = ["danny.yun@prattco.com", "david.jeon@prattco.com"]
 
-# 2. Add the user who created the request if they exist
-    # Note: Replace 'created_user' with the actual attribute name in your model
+# 1. Pull the email from the User table using the ID stored in obj.created_user
     if hasattr(obj, 'created_user') and obj.created_user:
-        RECIPIENTS.append(str(obj.created_user))    
+        try:
+            # Query the user_p table (User model) by ID
+            creator = User.query.get(obj.created_user)
+            if creator and creator.email:
+                RECIPIENTS.append(creator.email)
+                print(f"Added creator email: {creator.email}")
+        except Exception as e:
+            print(f"Could not retrieve creator email for ID {obj.created_user}: {e}")   
+# 2. Add Current User's email (the person who just saved/updated)
+    if current_user.email:
+        RECIPIENTS.append(current_user.email)
+
+# Remove duplicates
+    RECIPIENTS = list(set(RECIPIENTS))
 
     SMTP_SERVER = "smtp.office365.com"
     SMTP_PORT = 587
     SMTP_USERNAME = 'no-reply@chicagolandcfs.com'
     SMTP_PASSWORD = 'NReply@1418'
 
-    # --- Formatting the Body ---
-    # Create a list of strings: "'Material Name' from line X"
-    # material_list = [f"'{item.material}'" for item in obj.items]
+    # --- BUILD DYNAMIC SUMMARY ---
     material_list = [f"'{str(item.material)}'" for item in obj.items]
-    # Join them with commas
     materials_string = ", ".join(material_list)
     
+    # Identify the person who performed the action
+    if current_user.email:
+        user_display_name = current_user.email.split('@')[0]
+    else:
+        user_display_name = obj.requester
+            
+    action_verb = "submitted a new" if is_new else "updated the"
+
     # Build the final sentence
-    summary_text = f"'{obj.requester}' submitted price request for {materials_string} for '{obj.customer}'."
+    # summary_text = f"'{obj.requester}' submitted price request on {materials_string} for '{obj.customer}'."
+
+    summary_text = f"'{user_display_name}' {action_verb} price request for {materials_string} for '{obj.customer}'."
+    # ------------------------------
+
 
     body = f"""
     <p>{summary_text}</p>
@@ -278,7 +264,8 @@ def sendNotification(obj):
     # ---------------------------
 
     msg = MIMEText(body, "html")
-    msg['Subject'] = f'Price Request: {obj.customer}'
+    msg['Subject'] = f"{'New' if is_new else 'Updated'} Price Request: {obj.customer}"
+    # msg['Subject'] = f'Price Request: {obj.customer}'
     msg['From'] = EMAIL_FROM
     msg['To'] = ", ".join(RECIPIENTS)
 
@@ -300,8 +287,10 @@ def saveAction(form):
             quote_id = form.id
             
         quote_request_obj = getQuoteRequest(quote_id, True)
+
+        is_new = quote_request_obj.id is None
+
         original_created_date = quote_request_obj.created_date
-        
         existing_item_ids = [item.id for item in quote_request_obj.items]
         submitted_item_ids = set()
 
@@ -343,6 +332,10 @@ def saveAction(form):
             if fieldname not in excluded_keys:
                 setattr(quote_request_obj, fieldname, field.data)
         
+        if is_new:
+            quote_request_obj.created_user = current_user.id
+        
+        quote_request_obj.updated_user = current_user.id
         quote_request_obj.created_date = original_created_date
         
         db.session.add(quote_request_obj)
@@ -350,7 +343,8 @@ def saveAction(form):
         
         # Run the function
         # sendNotification()
-        sendNotification(quote_request_obj)
+        # sendNotification(quote_request_obj)
+        sendNotification(quote_request_obj, is_new)
 
         return str(quote_request_obj.id)
     except Exception as e:
