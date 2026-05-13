@@ -250,7 +250,12 @@ def do_quote_request_save():
 def sendNotification(obj):
     EMAIL_FROM = "no-reply@chicagolandcfs.com"
     RECIPIENTS = ["danny.yun@prattco.com", "david.jeon@prattco.com"]
-    
+
+# 2. Add the user who created the request if they exist
+    # Note: Replace 'created_user' with the actual attribute name in your model
+    if hasattr(obj, 'created_user') and obj.created_user:
+        RECIPIENTS.append(obj.created_user)    
+
     SMTP_SERVER = "smtp.office365.com"
     SMTP_PORT = 587
     SMTP_USERNAME = 'no-reply@chicagolandcfs.com'
