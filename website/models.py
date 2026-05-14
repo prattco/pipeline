@@ -253,9 +253,6 @@ class QualityClaimItem(db.Model):
 event.listen(QualityClaimItem, 'before_insert', before_insert_listener)
 event.listen(QualityClaimItem, 'before_update', before_update_listener)
 
-
-
-
 class QuoteRequest(db.Model):
     __tablename__ = 'quote_request' # Explicit naming is good practice
     id = db.Column(db.Integer, primary_key=True)   
@@ -310,3 +307,54 @@ class QuoteRequestItem(db.Model):
 
 event.listen(QuoteRequestItem, 'before_insert', before_insert_listener)
 event.listen(QuoteRequestItem, 'before_update', before_update_listener)
+
+
+
+class TaskList(db.Model):
+    __tablename__ = 'task_list' # Explicit naming is good practice
+    id = db.Column(db.Integer, primary_key=True)   
+    status = db.Column(db.String(None))
+    owner = db.Column(db.String(None))
+    customer = db.Column(db.String(None))
+    customer_prospect = db.Column(db.String(None))
+    project = db.Column(db.String(None))
+
+    remark = db.Column(db.String(None))
+
+    delete_flag = db.Column(db.Integer, nullable=False, default=0)
+    
+    # Updated FKs to point to user_p
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    version_id = db.Column(db.Integer, nullable=False)
+    __mapper_args__ = {
+        'version_id_col': version_id
+    }
+    items = db.relationship('TaskListItem', back_populates='task_list', cascade='all, delete-orphan')
+
+event.listen(TaskList, 'before_insert', before_insert_listener)
+event.listen(TaskList, 'before_update', before_update_listener)
+
+class TaskListItem(db.Model):
+
+    __tablename__ = 'task_list_item' # Explicit naming
+    id = db.Column(db.Integer, primary_key=True)
+    task_list_id = db.Column(db.Integer, db.ForeignKey('task_list.id'))
+    item_line = db.Column(db.Integer)
+    date = db.Column(db.Date, default=func.getdate())
+    follow_up = db.Column(db.Date)
+    note = db.Column(db.String(None)) 
+    
+    # Updated FKs to point to user_p
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    task_list = db.relationship('TaskList', back_populates='items')
+
+event.listen(TaskListItem, 'before_insert', before_insert_listener)
+event.listen(TaskListItem, 'before_update', before_update_listener)

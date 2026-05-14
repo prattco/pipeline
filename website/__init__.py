@@ -42,6 +42,7 @@ def create_app():
     from .modules.quality_claim import quality_claim
     from .modules.comm_log import comm_log
     from .modules.quote_request import quote_request
+    from .modules.task_list import task_list
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
@@ -49,6 +50,7 @@ def create_app():
     app.register_blueprint(quality_claim, url_prefix='/')
     app.register_blueprint(comm_log, url_prefix='/')
     app.register_blueprint(quote_request, url_prefix='/')
+    app.register_blueprint(task_list, url_prefix='/')
 
     from .models import User, Note
     

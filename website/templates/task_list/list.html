@@ -1,18 +1,18 @@
 {% extends "base.html" %}
-{% block title %}Quote Request{% endblock %}
+{% block title %}Task List{% endblock %}
 
 {% block content %}
 
 <br/>
-<h2 align="center">Quote Request</h2>
+<h2 align="center">Task List</h2>
 <br/>
 
 <div style="text-align: center;">
 
     <form action="" method="POST" align="center">
-        <input type="button" class="btn btn-primary btn-sm" onclick="location.href='/quote_request/create'"
-        value="CREATE QUOTE" />
-        <!-- <button formaction="/download" type="submit" class="btn btn-primary btn-sm">DOWNLOAD</button> -->
+        <input type="button" class="btn btn-primary btn-sm" onclick="location.href='/task_list/create'"
+        value="CREATE TASK" />
+        <button formaction="/download" type="submit" class="btn btn-primary btn-sm">DOWNLOAD</button>
     </form>
 
 </div>
@@ -25,96 +25,72 @@
 <div style="text-align: center; margin-bottom: 20px;">
     <!-- <label for="column-selector">Select Columns to Display:</label> -->
     <select id="column-selector" multiple="multiple" style="width: 400px;">
-        <option value="0" selected>Requester</option>
-        <option value="1" selected>Customer</option>
-        <option value="2" selected>Status</option>
-        <option value="3" selected>Location</option>
-        <option value="4" selected>Type</option>
-        <option value="5" selected>Application</option>
-        <option value="6" selected>Terms</option>
-        <option value="7">Remark</option>
-        <option value="8" selected>Created Date</option>
-        <option value="9" selected>Updated Date</option>
-               
+        <option value="0" selected>Status</option>
+        <option value="1" selected>Owner</option>
+        <option value="2" selected>Customer</option>
+        <option value="3" selected>Customer Type</option>
+        <option value="4" selected>Project</option>
+        <option value="5" selected>Remark</option>
+        <option value="6" selected>Created Date</option>
+        <option value="7" selected>Updated Date</option>
+
     </select>
 </div>
 <div style="display: flex; justify-content: center;">
     <table id="list" class="display stripe compact" style="width: 95%; ">
         <thead>
             <tr>
-                <th>Requester</th>
-                <th>Customer</th>
                 <th>Status</th>
-                <th>Location</th>
-                <th>Type</th>
-                <th>Application</th>
-                <th>Terms</th>
+                <th>Owner</th>
+                <th>Customer</th>
+                <th>Customer Type</th>
+                <th>Project</th>
                 <th>Remark</th>
                 <th>Created Date</th>
                 <th>Updated Date</th>
 
             </tr>
             <tr>
-                <th ><input type="text" data-column="0" class="filter-input" placeholder="Filter Requester"></th>
-                <th ><input type="text" data-column="1" class="filter-input" placeholder="Filter Customer"></th>
-                <th><input type="text" data-column="2" class="filter-input" placeholder="Filter Status"></th>
-                <th><input type="text" data-column="3" class="filter-input" placeholder="Filter location"></th>
-                <th><input type="text" data-column="4" class="filter-input" placeholder="Filter type"></th>
-                <th><input type="text" data-column="5" class="filter-input" placeholder="Filter application"></th>
-                <th><input type="text" data-column="6" class="filter-input" placeholder="Filter terms"></th>
-                <th><input type="text" data-column="7" class="filter-input" placeholder="Filter remark"></th>
-                <th><input type="text" data-column="8" class="filter-input" placeholder="Filter created_date"></th>
-                <th><input type="text" data-column="9" class="filter-input" placeholder="Filter updated_date"></th>
-
-                <!-- <th><input type="text" data-column="8" class="filter-input" placeholder="Filter Created Date"></th>
-                <th><input type="text" data-column="9" class="filter-input" placeholder="Filter Updated Date"></th> -->
-  
+                <th ><input type="text" data-column="0" class="filter-input" placeholder="Filter Status"></th>
+                <th ><input type="text" data-column="1" class="filter-input" placeholder="Filter Owner"></th>
+                <th><input type="text" data-column="2" class="filter-input" placeholder="Filter Customer"></th>
+                <th><input type="text" data-column="3" class="filter-input" placeholder="Filter Customer Type"></th>
+                <th><input type="text" data-column="4" class="filter-input" placeholder="Filter Project"></th>
+                <th><input type="text" data-column="5" class="filter-input" placeholder="Filter Remark"></th>
+                <th><input type="text" data-column="6" class="filter-input" placeholder="Filter Created Date"></th>
+                <th><input type="text" data-column="7" class="filter-input" placeholder="Filter Updated Date"></th>
 
             </tr>
         </thead>
 
         <tbody>
-            {% for quote_request in quote_requests %}
+            {% for task_list in list %}
             <tr>
                 <td>
-                    {{ quote_request.requester }}
+                    {{ task_list.status }}
                 </td>
                 <td>
-                    <a href="/quote_request/display/{{ quote_request.id }}">{{ quote_request.customer }}</a>
+                    {{ task_list.owner }}
                 </td>
                 <td>
-                    {{ quote_request.status }}
+                    <a href="/task_list/display/{{ task_list.id }}">{{ task_list.customer }}</a>
                 </td>
                 <td>
-                    {{ quote_request.location }}
+                    {{ task_list.customer_prospect }}
                 </td>
                 <td>
-                    {{ quote_request.type }}</a>
+                    <a href="/task_list/display/{{ task_list.id }}">{{ task_list.project }}</a>
                 </td>
                 <td>
-                    {{ quote_request.application }}
+                    {{ task_list.remark }}
                 </td>
-                <td>
-                    {{ quote_request.terms }}
-                </td>
-                <td>
-                    {{ quote_request.remark }}
-                </td>
-                <!-- <td>
-                    {{ quote_request.created_date }}
-                </td>
-                <td>
-                    {{ quote_request.updated_date }}
-                </td> -->
 
                 <td>
-                    {{ quote_request.created_date.strftime('%Y-%m-%d %H:%M') if quote_request.created_date else "" }}
+                    {{ task_list.created_date.strftime('%Y-%m-%d %H:%M') if task_list.created_date else "" }}
                 </td>
                 <td>
-                    {{ quote_request.updated_date.strftime('%Y-%m-%d %H:%M') if quote_request.updated_date else "" }}
+                    {{ task_list.updated_date.strftime('%Y-%m-%d %H:%M') if task_list.updated_date else "" }}
                 </td>
-
-
 
             </tr>
             {% endfor %}
