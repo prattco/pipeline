@@ -60,7 +60,7 @@ def do_task_list_index():
                 'customer_prospect': task_list.customer_prospect.strip() if task_list.customer_prospect else None,
 
 
-                'project': task_list.project.strip() if task_list.remark else None,
+                'project': task_list.project.strip() if task_list.project else None,
                 'remark': task_list.remark.strip() if task_list.remark else None,
                 # Pass the adjusted dates
                 'created_date': c_date,
