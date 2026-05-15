@@ -13,13 +13,11 @@ from ..lib.Extensions import prepareForm, errorForm, redirect_back, createWithRe
 
 from datetime import timedelta # Add this to your imports at the top
 
-
 from email.mime.multipart import MIMEMultipart
 from email.mime.application import MIMEApplication
 from email.mime.text import MIMEText
 import smtplib
 from email.message import EmailMessage
-
 
 quote_request = Blueprint('quote_request', __name__)
 
@@ -31,7 +29,6 @@ quote_request = Blueprint('quote_request', __name__)
 def do_quote_request_index():
     try:
         # Authorization Check
-        # if current_user.first_name not in ["ALL"]:
         if current_user.first_name != "ALL":
             flash('You are not authorized', category='error')
             return redirect('/')
@@ -160,9 +157,7 @@ def do_quote_request_item(id):
     try:
         if current_user.first_name == "ALL":
              pass
-        # elif current_user.first_name == "LG":
-        #      # LG logic handled in getQuoteRequest essentially, but explicit check here is fine
-        #      pass
+ 
         else:
             flash('You are not authorized', category='error')
             return redirect('/')
@@ -266,11 +261,12 @@ def sendNotification(obj, is_new=True):
 
     summary_text = f"'{user_display_name}' {action_verb} price request for {materials_string} for '{obj.customer}'."
     # ------------------------------
-
+    BASE_URL = "https://pipe-line.prattco.com/"  
+    task_link = f"{BASE_URL}/quote_request/display/{obj.id}"
 
     body = f"""
     <p>{summary_text}</p>
-    <p>Please check the system for details.</p>
+    <p>Please check <a href="{task_link}" style="color: #007bff; text-decoration: underline;">the system</a> for details.</p>
     """
     # ---------------------------
 
@@ -352,9 +348,6 @@ def saveAction(form):
         db.session.add(quote_request_obj)
         db.session.commit()
         
-        # Run the function
-        # sendNotification()
-        # sendNotification(quote_request_obj)
         sendNotification(quote_request_obj, is_new)
 
         return str(quote_request_obj.id)

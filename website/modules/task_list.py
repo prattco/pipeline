@@ -5,13 +5,19 @@ from sqlalchemy.orm.exc import StaleDataError
 from sqlalchemy.orm import joinedload
 import re
 
-from datetime import timedelta # Add this to your imports at the top
-
 # Adjust these imports to match your folder structure if needed
-from ..models import TaskList, TaskListItem  
+from ..models import TaskList, TaskListItem, User  
 from .. import db 
 from ..forms.TaskList import TaskListForm, TaskListItemForm
 from ..lib.Extensions import prepareForm, errorForm, redirect_back, createWithReference
+
+from datetime import timedelta # Add this to your imports at the top
+
+from email.mime.multipart import MIMEMultipart
+from email.mime.application import MIMEApplication
+from email.mime.text import MIMEText
+import smtplib
+from email.message import EmailMessage
 
 task_list = Blueprint('task_list', __name__)
 
@@ -212,70 +218,143 @@ def do_task_list_save():
         errorForm(form)
         return redirect_back()
 
+def sendNotification(obj, is_new=True):
+    EMAIL_FROM = "no-reply@chicagolandcfs.com"
+    RECIPIENTS = ["danny.yun@prattco.com", "sungsoon.jang@prattco.com"]
+
+# 1. 태스크 담당자(Owner)를 이메일 목록에 추가
+    # obj.owner 값이 있으면 '@prattco.com'을 붙여서 추가합니다.
+    if hasattr(obj, 'owner') and obj.owner:
+        owner_email = f"{obj.owner.strip()}@prattco.com"
+        RECIPIENTS.append(owner_email)
+        print(f"Added owner email: {owner_email}")
+
+# 2. 생성자(created_user)의 이메일 추가
+    if hasattr(obj, 'created_user') and obj.created_user:
+        try:
+            creator = User.query.get(obj.created_user)
+            if creator and creator.email:
+                RECIPIENTS.append(creator.email)
+                print(f"Added creator email: {creator.email}")
+        except Exception as e:
+            print(f"Could not retrieve creator email for ID {obj.created_user}: {e}")   
+
+    # 3. 현재 수정 중인 사용자의 이메일 추가
+    if current_user.email:
+        RECIPIENTS.append(current_user.email)
+
+# Remove duplicates
+    RECIPIENTS = list(set(RECIPIENTS))
+
+    SMTP_SERVER = "smtp.office365.com"
+    SMTP_PORT = 587
+    SMTP_USERNAME = 'no-reply@chicagolandcfs.com'
+    SMTP_PASSWORD = 'NReply@1418'
+
+# 사용자 표시 이름 설정
+    user_display_name = current_user.email.split('@')[0]
+
+
+    action_verb = "assigned a new" if is_new else "updated the"
+    summary_text = f"'{user_display_name}' {action_verb} task."
+
+    # ------------------------------
+    BASE_URL = "https://pipe-line.prattco.com/"  
+    task_link = f"{BASE_URL}/task_list/display/{obj.id}"
+
+    body = f"""
+    <p>{summary_text}</p>
+    <p>Please check <a href="{task_link}" style="color: #007bff; text-decoration: underline;">the system</a> for details.</p>
+    """
+    # ---------------------------
+
+    msg = MIMEText(body, "html")
+    msg['Subject'] = f"{'New' if is_new else 'Updated'} Task: {obj.customer}"
+    msg['From'] = EMAIL_FROM
+    msg['To'] = ", ".join(RECIPIENTS)
+
+    try:
+        smtp_obj = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        smtp_obj.starttls()
+        smtp_obj.login(SMTP_USERNAME, SMTP_PASSWORD)
+        smtp_obj.sendmail(EMAIL_FROM, RECIPIENTS, msg.as_string())
+        smtp_obj.quit()
+        print("Notification sent successfully.")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
 def saveAction(form):
     """
     Helper function to perform the actual save action.
     """
     try:
-        # 'True' creates a new instance if ID is empty
-        task_list = getTaskList(form.id.data, True)
-        
-        # Store the original created_date before populating the object (to prevent overwrite)
-        original_created_date = task_list.created_date
-        
-        # Remove ID from form data to avoid conflicts
-        delattr(form, 'id')
+        if hasattr(form.id, 'data'):
+            task_id = form.id.data
+        else:
+            task_id = form.id
+            
+        task_list_obj = getTaskList(task_id, True)
 
-        # Get list of existing item IDs currently in DB
-        existing_item_ids = [item.id for item in task_list.items]
+        is_new = task_list_obj.id is None
+
+        original_created_date = task_list_obj.created_date
+        existing_item_ids = [item.id for item in task_list_obj.items]
         submitted_item_ids = set()
 
-        # Loop through items submitted in the form
-        for index, task_list_item_form in enumerate(form.items, start=1):
-            task_list_item_form.item_line.data = index
-            item_id = task_list_item_form.form.id.data
+        for index, item_form_field in enumerate(form.items, start=1):
+            sub_form = item_form_field.form
             
-            # Remove ID from sub-form to avoid conflicts
-            delattr(task_list_item_form.form, 'id')
-
-            # Debugging logs
-            print(f"Item ID: {item_id}")
-            print(f"Item Form Data: {task_list_item_form.form.data}")
-
-            if item_id:
-                # Update existing item
-                item = TaskListItem.query.get(item_id)
-                task_list_item_form.form.populate_obj(item)
-                submitted_item_ids.add(int(item_id))
+            # --- CRITICAL FIX START ---
+            # 1. Capture the ID value to determine if it's an update or create
+            item_id_val = sub_form.id.data
+            
+            # 2. Extract the data but EXCLUDE 'id' from being populated into the model
+            # This prevents the "Cannot update identity column" error
+            item_data = {k: v for k, v in sub_form.data.items() if k != 'id'}
+            
+            if item_id_val and str(item_id_val).strip() and str(item_id_val) != '0':
+                # Existing Item Update
+                item = TaskListItem.query.get(item_id_val)
+                if item:
+                    for key, value in item_data.items():
+                        setattr(item, key, value)
+                    item.item_line = index
+                    submitted_item_ids.add(int(item_id_val))
             else:
-                # Create new item
+                # New Item Creation
                 item = TaskListItem()
-                task_list_item_form.form.populate_obj(item)
-                task_list.items.append(item)
+                for key, value in item_data.items():
+                    setattr(item, key, value)
+                item.item_line = index
+                task_list_obj.items.append(item)
+            # --- CRITICAL FIX END ---
 
-        # Identify items that were in the DB but NOT in the form submission (User deleted them)
-        remove_items = [remove_item for remove_item in existing_item_ids if
-                        remove_item not in submitted_item_ids]
-        
-        for remove_item_id in remove_items:
-            removeItem = TaskListItem.query.get(remove_item_id)
-            task_list.items.remove(removeItem)
+        for remove_id in [rid for rid in existing_item_ids if rid not in submitted_item_ids]:
+            removeItem = TaskListItem.query.get(remove_id)
+            if removeItem:
+                db.session.delete(removeItem)
 
-        # Populate the main object
-        form.populate_obj(task_list)
+        excluded_keys = ['id', 'items', 'csrf_token']
+        for fieldname, field in form._fields.items():
+            if fieldname not in excluded_keys:
+                setattr(task_list_obj, fieldname, field.data)
         
-        # Restore the original created_date
-        task_list.created_date = original_created_date
+        if is_new:
+            task_list_obj.created_user = current_user.id
         
-        db.session.add(task_list)
+        task_list_obj.updated_user = current_user.id
+        task_list_obj.created_date = original_created_date
+        
+        db.session.add(task_list_obj)
         db.session.commit()
+        
+        sendNotification(task_list_obj, is_new)
 
-        return str(task_list.id)
+        return str(task_list_obj.id)
     except Exception as e:
         print(f"Error in saveAction: {e}")
         db.session.rollback()
         abort(500)
-
 
 
 @task_list.route('/task_list/delete', methods=['POST'])
