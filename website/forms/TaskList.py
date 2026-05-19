@@ -43,6 +43,12 @@ class TaskListForm(FlaskForm):
 
                       
     remark = TextAreaField("Remark")
+
+    attachment_1 = StringField("Attachment 1")
+    attachment_2 = StringField("Attachment 2")
+    attachment_3 = StringField("Attachment 3")
+    attachment_4 = StringField("Attachment 4")
+    attachment_5 = StringField("Attachment 5")
   
     items = FieldList(FormField(TaskListItemForm, default=TaskListItem), min_entries=0)
     

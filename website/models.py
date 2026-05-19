@@ -309,21 +309,24 @@ event.listen(QuoteRequestItem, 'before_insert', before_insert_listener)
 event.listen(QuoteRequestItem, 'before_update', before_update_listener)
 
 
-
 class TaskList(db.Model):
-    __tablename__ = 'task_list' # Explicit naming is good practice
+    __tablename__ = 'task_list' 
     id = db.Column(db.Integer, primary_key=True)   
     status = db.Column(db.String(None))
     owner = db.Column(db.String(None))
     customer = db.Column(db.String(None))
     customer_prospect = db.Column(db.String(None))
     project = db.Column(db.String(None))
-
     remark = db.Column(db.String(None))
-
     delete_flag = db.Column(db.Integer, nullable=False, default=0)
     
-    # Updated FKs to point to user_p
+    # 💡 [정식 컬럼 추가] 비고란 우회 방식 파기, 독립형 파일 메타 전용 필드 마스터 매핑
+    attachment_1 = db.Column(db.String(None), nullable=True)
+    attachment_2 = db.Column(db.String(None), nullable=True)
+    attachment_3 = db.Column(db.String(None), nullable=True)
+    attachment_4 = db.Column(db.String(None), nullable=True)
+    attachment_5 = db.Column(db.String(None), nullable=True)
+    
     created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
     created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
     updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
@@ -334,6 +337,7 @@ class TaskList(db.Model):
         'version_id_col': version_id
     }
     items = db.relationship('TaskListItem', back_populates='task_list', cascade='all, delete-orphan')
+
 
 event.listen(TaskList, 'before_insert', before_insert_listener)
 event.listen(TaskList, 'before_update', before_update_listener)

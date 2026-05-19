@@ -23,7 +23,6 @@
 
 
 <div style="text-align: center; margin-bottom: 20px;">
-    <!-- <label for="column-selector">Select Columns to Display:</label> -->
     <select id="column-selector" multiple="multiple" style="width: 400px;">
         <option value="0" selected>Status</option>
         <option value="1" selected>Owner</option>
@@ -81,8 +80,14 @@
                 <td>
                     <a href="/task_list/display/{{ task_list.id }}">{{ task_list.project }}</a>
                 </td>
+                
                 <td>
-                    {{ task_list.remark }}
+                    {% if task_list.remark and '||FILE_INFO_' in task_list.remark %}
+                        {# 파일 정보가 시작되는 기호 '||FILE_INFO_' 전의 순수 업무 비고 문자열만 정제합니다 #}
+                        {{ task_list.remark.split('||FILE_INFO_')[0] | trim }}
+                    {% else %}
+                        {{ task_list.remark or "" }}
+                    {% endif %}
                 </td>
 
                 <td>
@@ -111,7 +116,7 @@
             paging: true,
             searching: true,
             ordering: true,
-            order: [[8, 'desc']], 
+            order: [[6, 'desc']], // Default sort by Created Date descending (Index 6)
             pageLength: 100,
             autoWidth: false, 
             responsive: true

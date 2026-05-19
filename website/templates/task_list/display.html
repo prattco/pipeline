@@ -39,7 +39,6 @@
     <div class="input-container">
         <div class="columnlabel">
             {{ form.status.label }}
-
         </div>
         <div class="columninput uneditable">
             {{ form.status.data }}
@@ -65,6 +64,7 @@
             {{ form.customer_prospect.data }}
         </div>
     </div>
+    
     <div class="input-container">
         <div class="columnlabel">
             {{ form.project.label }}
@@ -76,7 +76,38 @@
             {{ form.remark.label }}
         </div>
         <div class="columninput">
-            {{ form.remark.data }}
+            <div style="white-space: pre-wrap; word-break: break-all;">{{ form.remark.data or "" }}</div>
+        </div>
+    </div>
+
+    <div class="input-container" style="margin-top: 2px;">
+        <div class="columnlabel" style="background-color: #f8fafc; font-weight: bold; color: #334155;">
+            <i class="fa fa-paperclip"></i> Attachments
+        </div>
+        <div class="columninput_wide" style="padding: 12px; min-height: 46px; background-color: #ffffff; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+            {% set has_files = false %}
+            
+            {% for i in range(1, 6) %}
+                {% set field_name = 'attachment_' ~ i %}
+                {% set form_field = form[field_name] %}
+                {% set db_val = form_field.data if form_field and form_field.data else none %}
+
+                {% if db_val and '||URL_INFO_' in db_val %}
+                    {% set has_files = true %}
+                    {% set parts = db_val.split('||URL_INFO_' ~ i ~ ':') %}
+                    {% set filename = parts[0].strip() %}
+                    {% set hyperlink = parts[1].strip() if parts|length > 1 else "#" %}
+
+                    <a href="{{ hyperlink }}" target="_blank" title="Download from SharePoint" style="display: inline-flex; align-items: center; gap: 6px; color: #1e40af; text-decoration: none; font-weight: 600; font-size: 0.82rem; background-color: #f0fdf4; padding: 5px 10px; border-radius: 4px; border: 1px solid #bbf7d0; box-shadow: 0 1px 2px rgba(0,0,0,0.02); transition: all 0.15s ease;">
+                        <i class="fa fa-file-text-o" style="color: #16a34a; font-size: 0.9rem;"></i>
+                        <span style="border-bottom: 1px dashed #16a34a; padding-bottom: 1px;">{{ filename }}</span>
+                    </a>
+                {% endif %}
+            {% endfor %}
+
+            {% if not has_files %}
+                <span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">No attached files.</span>
+            {% endif %}
         </div>
     </div>
    
@@ -84,41 +115,24 @@
 
     <div class="detail-section" id="detail-section">
         <div class="detail-header">
-            <div class="detail-column width1">
-                Date
-            </div>
-            <div class="detail-column width1">
-                Follow Up
-            </div>
-            <div class="detail-column width3">
-                Note
-            </div>
-
+            <div class="detail-column width1">Date</div>
+            <div class="detail-column width1">Follow Up</div>
+            <div class="detail-column width3">Note</div>
         </div>
 
         {% if form.items %}
-            {# UPDATED LINE BELOW #}
             {% for item_form in form.items | sort(attribute='date.data', reverse=True) %}
                 <div class="detail-row">
-                    <div class="detail-column width1">
-                        {{ item_form.date.data }}
-                    </div>
-                    <div class="detail-column width1">
-                        {{ item_form.follow_up.data }}
-                    </div>
-                    <div class="detail-column width3">
-                        {{ item_form.note.data }}
-                    </div>
-
+                    <div class="detail-column width1">{{ item_form.date.data }}</div>
+                    <div class="detail-column width1">{{ item_form.follow_up.data }}</div>
+                    <div class="detail-column width3">{{ item_form.note.data }}</div>
                 </div>
             {% endfor %}
         {% else %}
-            <p>No items to display.</p>
+            <p style="padding: 15px; text-align: center; color: #64748b;">No items to display.</p>
         {% endif %}
-        
     </div>
 
     <hr>
-
 </div>
 {% endblock %}
