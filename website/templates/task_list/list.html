@@ -25,13 +25,14 @@
 <div style="text-align: center; margin-bottom: 20px;">
     <select id="column-selector" multiple="multiple" style="width: 400px;">
         <option value="0" selected>Status</option>
-        <option value="1" selected>Owner</option>
-        <option value="2" selected>Customer</option>
-        <option value="3" selected>Customer Type</option>
-        <option value="4" selected>Project</option>
-        <option value="5" selected>Remark</option>
-        <option value="6" selected>Created Date</option>
-        <option value="7" selected>Updated Date</option>
+        <option value="1" selected>Created User</option>
+        <option value="2" selected>Owner</option>
+        <option value="3" selected>Customer</option>
+        <option value="4" selected>Customer Type</option>
+        <option value="5" selected>Project</option>
+        <option value="6" selected>Remark</option>
+        <option value="7" selected>Created Date</option>
+        <option value="8" selected>Updated Date</option>
 
     </select>
 </div>
@@ -40,6 +41,7 @@
         <thead>
             <tr>
                 <th>Status</th>
+                <th>Created User</th>
                 <th>Owner</th>
                 <th>Customer</th>
                 <th>Customer Type</th>
@@ -52,6 +54,7 @@
             <tr>
                 <th ><input type="text" data-column="0" class="filter-input" placeholder="Filter Status"></th>
                 <th ><input type="text" data-column="1" class="filter-input" placeholder="Filter Owner"></th>
+                <th ><input type="text" data-column="1" class="filter-input" placeholder="Filter Created User"></th>
                 <th><input type="text" data-column="2" class="filter-input" placeholder="Filter Customer"></th>
                 <th><input type="text" data-column="3" class="filter-input" placeholder="Filter Customer Type"></th>
                 <th><input type="text" data-column="4" class="filter-input" placeholder="Filter Project"></th>
@@ -63,40 +66,21 @@
         </thead>
 
         <tbody>
-            {% for task_list in list %}
+            {% for task in list %}
             <tr>
+                <td>{{ task.status.strip() if task.status else "" }}</td>
+                <td>{{ task.created_user_name }}</td>
+                <td>{{ task.owner.strip() if task.owner else "" }}</td>
                 <td>
-                    {{ task_list.status }}
+                    <a href="/task_list/display/{{ task.id }}">{{ task.customer.strip() if task.customer else "" }}</a>
                 </td>
+                <td>{{ task.customer_prospect.strip() if task.customer_prospect else "" }}</td>
                 <td>
-                    {{ task_list.owner }}
+                    <a href="/task_list/display/{{ task.id }}">{{ task.project.strip() if task.project else "" }}</a>
                 </td>
-                <td>
-                    <a href="/task_list/display/{{ task_list.id }}">{{ task_list.customer }}</a>
-                </td>
-                <td>
-                    {{ task_list.customer_prospect }}
-                </td>
-                <td>
-                    <a href="/task_list/display/{{ task_list.id }}">{{ task_list.project }}</a>
-                </td>
-                
-                <td>
-                    {% if task_list.remark and '||FILE_INFO_' in task_list.remark %}
-                        {# 파일 정보가 시작되는 기호 '||FILE_INFO_' 전의 순수 업무 비고 문자열만 정제합니다 #}
-                        {{ task_list.remark.split('||FILE_INFO_')[0] | trim }}
-                    {% else %}
-                        {{ task_list.remark or "" }}
-                    {% endif %}
-                </td>
-
-                <td>
-                    {{ task_list.created_date.strftime('%Y-%m-%d %H:%M') if task_list.created_date else "" }}
-                </td>
-                <td>
-                    {{ task_list.updated_date.strftime('%Y-%m-%d %H:%M') if task_list.updated_date else "" }}
-                </td>
-
+                <td>{{ task.remark.strip() if task.remark else "" }}</td>
+                <td>{{ task.created_date_cst }}</td>
+                <td>{{ task.updated_date_cst }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -116,7 +100,7 @@
             paging: true,
             searching: true,
             ordering: true,
-            order: [[6, 'desc']], // Default sort by Created Date descending (Index 6)
+            order: [[7, 'desc']], // Default sort by Created Date descending (Index 6)
             pageLength: 100,
             autoWidth: false, 
             responsive: true

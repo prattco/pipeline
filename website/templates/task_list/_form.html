@@ -169,7 +169,7 @@
         <div class="detail-header">
             <div class="detail-column width1">Action</div>
             <div class="detail-column width1">Date</div>
-            <div class="detail-column width1">Follow Up</div>
+
             <div class="detail-column width3">Note</div>
         </div>
 
@@ -181,9 +181,7 @@
             <div class="detail-column width1">
                 {{ item_form.date() }}
             </div>
-            <div class="detail-column width1">
-                {{ item_form.follow_up() }}
-            </div>
+
             <div class="detail-column width3">
                 {{ item_form.note() }}
             </div>
@@ -212,11 +210,10 @@
         <div class="detail-column width1">
             {{ item_form_template.date() }}
         </div>
-        <div class="detail-column width1">
-            {{ item_form_template.follow_up() }}
-        </div>
+
         <div class="detail-column width3">
             {{ item_form_template.note() }}
         </div>
+
     </div>
 </div>

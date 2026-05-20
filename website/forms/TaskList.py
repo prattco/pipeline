@@ -17,8 +17,8 @@ class TaskListItemForm(FlaskForm):
     item_line = IntegerField("Item Line")
     date = DateField("Date", format='%Y-%m-%d',validators=[DataRequired()])
     note = TextAreaField("Note")
-    # ADD validators=[Optional()] HERE
-    follow_up = DateField("Follow Up", format='%Y-%m-%d', validators=[Optional()])
+    created_user = StringField("Created User")
+
 
 
     class Meta:
@@ -32,7 +32,7 @@ class TaskListForm(FlaskForm):
                                  ('Incomplete', 'Incomplete')
                                  ], 
                         validators=[DataRequired()])
-
+    created_user = StringField("Created User")
     owner = StringField("Owner")
     customer = StringField("Customer",validators=[DataRequired()])
     customer_prospect = SelectField("Customer/Prospect",

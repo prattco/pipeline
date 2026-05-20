@@ -65,33 +65,19 @@ def upload_file_to_sharepoint(file_storage, custom_filename):
 @login_required
 def do_task_list_index():
     try:
+        # [안정화 반영] 사용자의 권한 검증 유지
         if current_user.first_name != "ALL":
             flash('You are not authorized', category='error')
             return redirect('/')
-        task_lists = TaskList.query.filter(TaskList.delete_flag != 1).order_by(desc(TaskList.id)).all()
-        cst_offset = timedelta(hours=-5)    
-        task_list_list = []
-        for task_list in task_lists:
-            subq = db.session.query(func.max(TaskListItem.date)).filter_by(task_list_id=task_list.id).scalar_subquery()
-            latest_item = db.session.query(TaskListItem.note, TaskListItem.date, TaskListItem.follow_up).filter(
-                TaskListItem.task_list_id == task_list.id,
-                TaskListItem.date == subq
-            ).first()
-            c_date = task_list.created_date + cst_offset if task_list.created_date else None
-            u_date = task_list.updated_date + cst_offset if task_list.updated_date else None
-            task_list_data = {
-                'id': task_list.id,
-                'status': task_list.status.strip() if task_list.status else None,
-                'owner': task_list.owner.strip() if task_list.owner else None,
-                'customer': task_list.customer.strip() if task_list.customer else None,
-                'customer_prospect': task_list.customer_prospect.strip() if task_list.customer_prospect else None,
-                'project': task_list.project.strip() if task_list.project else None,
-                'remark': task_list.remark.strip() if task_list.remark else None,
-                'created_date': c_date,
-                'updated_date': u_date,
-            }
-            task_list_list.append(task_list_data)
-        return render_template("task_list/list.html", user=current_user, list=task_list_list)
+            
+        # 데이터베이스 객체 리스트를 그대로 가져옵니다.
+        task_lists = TaskList.query\
+            .filter(TaskList.delete_flag != 1)\
+            .options(joinedload(TaskList.creator))\
+            .order_by(desc(TaskList.id))\
+            .all()
+        # 가공용 루프를 돌릴 필요 없이 객체 리스트를 그대로 템플릿으로 토스합니다.
+        return render_template("task_list/list.html", user=current_user, list=task_lists)
     except Exception as e:
         print(f"Error in do_task_list_index: {e}")
         return redirect('/')
@@ -115,17 +101,48 @@ def prepareFormWithReference():
     form.items.entries = []
     return form
 
-@task_list.route('/task_list/display/<int:id>', methods=['GET', 'POST'])
+@task_list.route('/task_list/display/<id>', methods=['GET'])
 @login_required
 def do_task_list_display(id):
     try:
-        if current_user.first_name != "ALL": abort(403)
-        task_list = getTaskList(id)
-        form = TaskListForm(obj=task_list)
-        item_form = TaskListItemForm()
-        return render_template("task_list/display.html", user=current_user, form=form, item_form=item_form)
+        if current_user.first_name != "ALL":
+            flash('You are not authorized', category='error')
+            return redirect('/')
+
+        # models.py에 creator 관계를 추가했으므로 에러 없이 정상 작동 및 쿼리 최적화 완료
+        task_list_obj = TaskList.query\
+            .options(
+                joinedload(TaskList.creator),
+                joinedload(TaskList.items).joinedload(TaskListItem.creator)
+            )\
+            .filter_by(id=id)\
+            .first()
+
+        if task_list_obj is None:
+            abort(404)
+
+        form = TaskListForm(obj=task_list_obj)
+        form.id.data = task_list_obj.id
+        form.created_user.data = task_list_obj.created_user_name
+
+        form.items.entries = []
+        for item in task_list_obj.items:
+            item_form = TaskListItemForm(obj=item)
+            
+            # 정석적인 객체 지향형 데이터 매핑
+            if item.creator and item.creator.email:
+                item_user_prefix = item.creator.email.split('@')[0]
+            else:
+                item_user_prefix = ""
+                
+            item_form.created_user.data = item_user_prefix
+            form.items.append_entry(item_form)
+
+        return render_template("task_list/display.html", user=current_user, form=form)
     except Exception as e:
-        abort(500)
+        print(f"Error in do_task_list_display: {e}")
+        return redirect('/')
+
 
 @task_list.route('/task_list/item/<int:id>', methods=['GET', 'POST'])
 @login_required

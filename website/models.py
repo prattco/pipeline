@@ -2,6 +2,7 @@ from sqlalchemy.sql import func
 from sqlalchemy import event
 from flask_login import current_user, UserMixin
 from . import db
+from datetime import timedelta
 
 def before_insert_listener(mapper, connection, target):
     target.created_user = current_user.id
@@ -333,6 +334,31 @@ class TaskList(db.Model):
     updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
     
     version_id = db.Column(db.Integer, nullable=False)
+
+    @property
+    def created_date_cst(self):
+        if self.created_date:
+            cst_offset = timedelta(hours=-5)
+            return (self.created_date + cst_offset).strftime('%Y-%m-%d %H:%M')
+        return ""
+
+    @property
+    def updated_date_cst(self):
+        if self.updated_date:
+            cst_offset = timedelta(hours=-5)
+            return (self.updated_date + cst_offset).strftime('%Y-%m-%d %H:%M')
+        return ""
+
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    creator = db.relationship('User', foreign_keys=[created_user], backref='created_tasks')
+
+    @property
+    def created_user_name(self):
+        # 관계형 데이터가 존재하고 이메일이 등록되어 있는 경우
+        if self.creator and self.creator.email:
+            return self.creator.email.split('@')[0]
+        return "Unknown" # 또는 "" (빈 문자열)
+
     __mapper_args__ = {
         'version_id_col': version_id
     }
@@ -354,6 +380,8 @@ class TaskListItem(db.Model):
     
     # Updated FKs to point to user_p
     created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    creator = db.relationship('User', foreign_keys=[created_user])
+    
     created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
     updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
     updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
