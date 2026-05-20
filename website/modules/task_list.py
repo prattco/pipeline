@@ -6,6 +6,7 @@ from sqlalchemy.orm import joinedload
 import re
 
 from ..models import TaskList, TaskListItem, User  
+from .. import azurecred
 from .. import db 
 from ..forms.TaskList import TaskListForm, TaskListItemForm
 from ..lib.Extensions import prepareForm, errorForm, redirect_back, createWithReference
@@ -21,11 +22,13 @@ import requests
 import urllib.parse
 import msal
 
+
+
 task_list = Blueprint('task_list', __name__)
 
-CLIENT_ID = "f91f74a0-98f1-4c4e-b73e-ec7927859ddd"
-TENANT_ID = "62795f34-e80c-46cb-bb48-f72a3f9ec90f"
-CLIENT_SECRET = "6l_8Q~wGlQ8_RUSL~nV1RX~WgjKZxWIg-ZHvZdo~"
+CLIENT_ID = azurecred.CLIENT_ID
+TENANT_ID = azurecred.TENANT_ID
+CLIENT_SECRET = azurecred.CLIENT_SECRET
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 SHAREPOINT_SITE_ID = "802m.sharepoint.com,b22264cc-8d3f-4f25-ba53-a2d1b134e40b,0ada892e-67f3-41cc-b30c-5815ab635a79"
 
