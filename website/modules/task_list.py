@@ -225,7 +225,7 @@ def do_task_list_save():
 
 def sendNotification(obj, is_new=True):
     EMAIL_FROM = "no-reply@chicagolandcfs.com"
-    RECIPIENTS = ["danny.yun@prattco.com"]
+    RECIPIENTS = ["danny.yun@prattco.com","sungsoon.jang@prattco.com"]
     if hasattr(obj, 'owner') and obj.owner:
         RECIPIENTS.append(f"{obj.owner.strip()}@prattco.com")
     if hasattr(obj, 'created_user') and obj.created_user:
