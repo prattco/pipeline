@@ -266,6 +266,7 @@ class QuoteRequest(db.Model):
     application = db.Column(db.String(None))
     terms = db.Column(db.String(None))
     remark = db.Column(db.String(None))
+    stage = db.Column(db.String(None))
     delete_flag = db.Column(db.Integer, nullable=False, default=0)
     
     # Updated FKs to point to user_p

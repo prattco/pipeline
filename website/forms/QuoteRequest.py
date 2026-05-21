@@ -45,7 +45,17 @@ class QuoteRequestForm(FlaskForm):
     application = StringField("Application",validators=[DataRequired()])
     terms = StringField("Terms")
     remark = TextAreaField("Remark")
-  
+    stage = SelectField("Stage", 
+                        choices=[('Initiated', 'Initiated'),
+                                ('Waiting on Cost', 'Waiting on Cost'),
+                                ('Hold', 'Hold'),
+                                ('Quoted', 'Quoted'),
+                                ('2nd Round', '2nd Round'),
+                                ('3rd Round', '3rd Round'),
+                                ('Accepted', 'Accepted'),
+                                 ], 
+                        validators=[DataRequired()])
+
     items = FieldList(FormField(QuoteRequestItemForm, default=QuoteRequestItem), min_entries=0)
 
 

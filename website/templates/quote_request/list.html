@@ -33,8 +33,9 @@
         <option value="5" selected>Application</option>
         <option value="6" selected>Terms</option>
         <option value="7">Remark</option>
-        <option value="8" selected>Created Date</option>
-        <option value="9" selected>Updated Date</option>
+        <option value="8" selected>Stage</option>
+        <option value="9" selected>Created Date</option>
+
                
     </select>
 </div>
@@ -50,8 +51,9 @@
                 <th>Application</th>
                 <th>Terms</th>
                 <th>Remark</th>
+                <th>Stage</th>
                 <th>Created Date</th>
-                <th>Updated Date</th>
+                
 
             </tr>
             <tr>
@@ -63,8 +65,9 @@
                 <th><input type="text" data-column="5" class="filter-input" placeholder="Filter application"></th>
                 <th><input type="text" data-column="6" class="filter-input" placeholder="Filter terms"></th>
                 <th><input type="text" data-column="7" class="filter-input" placeholder="Filter remark"></th>
-                <th><input type="text" data-column="8" class="filter-input" placeholder="Filter created_date"></th>
-                <th><input type="text" data-column="9" class="filter-input" placeholder="Filter updated_date"></th>
+                <th><input type="text" data-column="8" class="filter-input" placeholder="Filter stage"></th>
+                <th><input type="text" data-column="9" class="filter-input" placeholder="Filter created_date"></th>
+                
 
                 <!-- <th><input type="text" data-column="8" class="filter-input" placeholder="Filter Created Date"></th>
                 <th><input type="text" data-column="9" class="filter-input" placeholder="Filter Updated Date"></th> -->
@@ -100,19 +103,15 @@
                 <td>
                     {{ quote_request.remark }}
                 </td>
-                <!-- <td>
-                    {{ quote_request.created_date }}
-                </td>
+
                 <td>
-                    {{ quote_request.updated_date }}
-                </td> -->
+                    {{ quote_request.stage }}
+                </td>
 
                 <td>
                     {{ quote_request.created_date.strftime('%Y-%m-%d %H:%M') if quote_request.created_date else "" }}
                 </td>
-                <td>
-                    {{ quote_request.updated_date.strftime('%Y-%m-%d %H:%M') if quote_request.updated_date else "" }}
-                </td>
+
 
 
 
@@ -135,7 +134,7 @@
             paging: true,
             searching: true,
             ordering: true,
-            order: [[8, 'desc']], 
+            order: [[9, 'desc']], 
             pageLength: 100,
             autoWidth: false, 
             responsive: true

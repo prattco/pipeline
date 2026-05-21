@@ -58,6 +58,7 @@ def do_quote_request_index():
                 'application': quote_request.application.strip() if quote_request.application else "",
                 'terms': quote_request.terms.strip() if quote_request.terms else "",
                 'remark': quote_request.remark.strip() if quote_request.remark else "",
+                'stage': quote_request.stage.strip() if quote_request.stage else "",
                 # 'created_date': quote_request.created_date,
                 # 'updated_date': quote_request.updated_date,
                 # Pass the adjusted dates
