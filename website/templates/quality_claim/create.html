@@ -1,8 +1,11 @@
 {% extends "base.html" %} {% block title %}Quality Claim{% endblock %} 
 
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/quality_claim.css') }}" />
+{% endblock %}
+
 {% block content %}
 <br/> 
 <h2 align="center">Create Quality Claim</h2>
 {% include("/quality_claim/_form.html") %}
 {% endblock %}
-

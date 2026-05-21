@@ -1,0 +1,32 @@
+/* ==========================================================================
+   PipeLine Module Sub-Table Width Customization (static/css/pipe_line.css)
+   ========================================================================== */
+
+/* 1. 액션 열 (마이너스 버튼 / 디스플레이용 공백) */
+.pipe-line-container .detail-column:nth-child(1) {
+    flex: 0 0 50px !important;
+    text-align: center;
+}
+
+/* 2. Date (커뮤니케이션 일자) */
+.pipe-line-container .detail-column:nth-child(2) {
+    flex: 0 0 140px !important; /* 날짜 인풋 박스가 깨지지 않도록 고정폭 보장 */
+}
+
+/* 3. Follow Up (후속 조치 예정일) */
+.pipe-line-container .detail-column:nth-child(3) {
+    flex: 0 0 140px !important; /* 날짜 인풋 박스 고정폭 보장 */
+}
+
+/* 4. Note (가장 길게 채워질 상담 내역 및 특이사항) */
+.pipe-line-container .detail-column:nth-child(4) {
+    flex: 5 !important; /* 남은 잔여 가로 영역을 전부 몰아주기 */
+    min-width: 350px;
+}
+
+/* 테이블 내부 textarea 최적화 */
+.pipe-line-container .detail-column textarea {
+    resize: vertical;
+    height: 34px;
+    min-height: 34px;
+}

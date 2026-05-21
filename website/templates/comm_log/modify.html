@@ -1,5 +1,9 @@
 {% extends "base.html" %} {% block title %}Communication Log{% endblock %} 
 
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/comm_log.css') }}" />
+{% endblock %}
+
 {% block content %}
 <br/> 
 <h2 align="center">Communication Log</h2>

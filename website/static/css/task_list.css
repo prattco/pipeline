@@ -1,0 +1,70 @@
+/* ==========================================================================
+   TaskList Module Sub-Table Width Customization (static/css/task_list.css)
+   ========================================================================== */
+
+/* ----------------- [1. 작성 & 수정 폼 레이아웃 (3열)] ----------------- */
+/* Action 열 (마이너스 삭제 버튼) */
+.task-list-container .form-table .detail-column:nth-child(1) {
+    flex: 0 0 50px !important;
+    text-align: center;
+}
+
+/* Date 열 (날짜 선택 인풋) */
+.task-list-container .form-table .detail-column:nth-child(2) {
+    flex: 0 0 140px !important; /* 날짜 박스 크기 고정 보장 */
+}
+
+/* Note 열 (상세 비고 내용 입력) */
+.task-list-container .form-table .detail-column:nth-child(3) {
+    flex: 6 !important; /* 남은 잔여 공간 전부 할당 */
+    min-width: 400px;
+}
+
+
+/* ----------------- [2. 조회 전용 화면 레이아웃 (3열)] ----------------- */
+/* Date 열 (등록일) */
+.task-list-container .display-table .detail-column:nth-child(1) {
+    flex: 1.5 !important;
+    text-align: center;
+}
+
+/* User 열 (등록자 이름/이메일 정보) */
+.task-list-container .display-table .detail-column:nth-child(2) {
+    flex: 1.5 !important;
+    text-align: center;
+}
+
+/* Note 열 (텍스트) */
+.task-list-container .display-table .detail-column:nth-child(3) {
+    flex: 5 !important;
+    text-align: left;
+    padding-left: 15px;
+}
+
+/* 파일 업로드 컴포넌트 텍스트 래핑 보정 */
+.task-list-container .columninput_wide {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* 조회 화면(display-table)에 나타나는 입력 폼을 일반 텍스트로 위장시키는 안전장치 */
+.task-list-container .display-table input,
+.task-list-container .display-table textarea {
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    pointer-events: none !important; /* 클릭/수정 완벽 차단 */
+    resize: none !important;         /* 텍스트에어리어 사이즈 조절 막기 */
+    color: #4a5568 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    width: 100% !important;
+}
+
+/* 캘린더 아이콘 강제 숨김 */
+.task-list-container .display-table input[type="date"]::-webkit-calendar-picker-indicator {
+    display: none !important;
+}

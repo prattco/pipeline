@@ -1,5 +1,9 @@
 {% extends "base.html" %} {% block title %}Task List{% endblock %} 
 
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/task_list.css') }}" />
+{% endblock %}
+
 {% block content %}
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
 <script type="text/javascript">
@@ -26,7 +30,8 @@
 <br/> 
 <h2 align="center">Task Display</h2>
 <br />
-<div class="form-group mx-sm-3 mb-2">
+
+<div class="form-group task-list-container mx-sm-3 mb-2">
     <div align="left">
         <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/task_list/modify/{{ form.id.data }}'">
         <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
@@ -34,7 +39,7 @@
     </div>
 </div>
 <br />
-<div class="form-group mx-sm-3 mb-2">
+<div class="form-group task-list-container mx-sm-3 mb-2">
 
     <div class="input-container">
         <div class="columnlabel">
@@ -50,9 +55,7 @@
         <div class="columninput">
             {{ form.customer.data }}
         </div>
-
     </div>
-
 
     <div class="input-container">
         <div class="columnlabel">
@@ -67,11 +70,9 @@
         <div class="columninput">
             {{ form.created_user.data }}
         </div>        
-
     </div>
     
     <div class="input-container">
-
         <div class="columnlabel">
             {{ form.customer_prospect.label }}
         </div>
@@ -85,10 +86,9 @@
         <div class="columninput">
             {{ form.project.data }}
         </div>
-
     </div>
+    
     <div class="input-container">
-
         <div class="columnlabel">
             {{ form.remark.label }}
         </div>
@@ -130,34 +130,29 @@
    
     <hr>
 
-    <div class="detail-section" id="detail-section" style="margin-top: 30px; box-shadow: none; border: none;">
-        
-        <div class="detail-header" style="display: flex; background-color: #f8fafc; border-bottom: 2px solid #e2e8f0; font-weight: bold; padding: 10px 0;">
-            <div class="detail-column" style="flex: 1.5; text-align: center; color: #4a5568;">Date</div>
-            <div class="detail-column" style="flex: 1.5; text-align: center; color: #4a5568;">User</div>
-            <div class="detail-column" style="flex: 4; text-align: left; padding-left: 15px; color: #4a5568;">Note</div>
+    <div class="detail-section display-table" id="detail-section" style="margin-top: 30px;">
+        <div class="detail-header">
+            <div class="detail-column">Date</div>
+            <div class="detail-column">User</div>
+            <div class="detail-column">Note</div>
         </div>
 
         {% if form.items %}
             {% for item_form in form.items | sort(attribute='date.data', reverse=True) %}
-                <div class="detail-row" style="display: flex; border-bottom: 1px solid #edf2f7; padding: 12px 0; align-items: center; background: transparent; box-shadow: none;">
-                    
-                    <div class="detail-column" style="flex: 1.5; text-align: center; background: none; border: none; box-shadow: none;">
+                <div class="detail-row">
+                    <div class="detail-column">
                         {{ item_form.date.data if item_form.date.data else "" }}
                     </div>
-                    
-                    <div class="detail-column" style="flex: 1.5; text-align: center; background: none; border: none; box-shadow: none; color: #4a5568;">
+                    <div class="detail-column">
                         {{ item_form.created_user.data if item_form.created_user.data else "" }}
                     </div>
-                    
-                    <div class="detail-column" style="flex: 4; text-align: left; padding-left: 15px; background: none; border: none; box-shadow: none; white-space: pre-wrap; word-break: break-all;">
+                    <div class="detail-column" style="white-space: pre-wrap; word-break: break-all;">
                         {{ item_form.note.data if item_form.note.data else "" }}
                     </div>
-                    
                 </div>
             {% endfor %}
         {% else %}
-            <div class="detail-row" style="justify-content: center; padding: 30px; color: #94a3b8; font-style: italic; border-bottom: 1px solid #edf2f7;">
+            <div class="detail-row" style="justify-content: center; padding: 30px; color: #94a3b8; font-style: italic;">
                 No items available.
             </div>
         {% endif %}

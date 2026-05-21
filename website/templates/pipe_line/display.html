@@ -1,4 +1,9 @@
-{% extends "base.html" %} {% block title %}Pipe Line{% endblock %} 
+{% extends "base.html" %} 
+{% block title %}Pipe Line{% endblock %} 
+
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pipe_line.css') }}" />
+{% endblock %}
 
 {% block content %}
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
@@ -26,7 +31,7 @@
 <br/> 
 <h2 align="center">Pipe Line Display</h2>
 <br />
-<div class="form-group mx-sm-3 mb-2">
+<div class="form-group pipe-line-container mx-sm-3 mb-2">
     <div align="left">
         <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/pipe_line/modify/{{ form.id.data }}'">
         <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
@@ -34,12 +39,11 @@
     </div>
 </div>
 <br />
-<div class="form-group mx-sm-3 mb-2">
+<div class="form-group pipe-line-container mx-sm-3 mb-2">
 
     <div class="input-container">
         <div class="columnlabel">
             {{ form.shared.label }}
-
         </div>
         <div class="columninput uneditable">
             {{ form.shared.data }}
@@ -96,7 +100,6 @@
     </div>
 
     <div class="input-container">
-
         <div class="columnlabel">
             {{ form.customer_prospect.label }}
         </div>
@@ -109,11 +112,9 @@
         <div class="columninput">
             {{ form.application.data }}
         </div>
-
     </div>
 
     <div class="input-container">
-
         <div class="columnlabel">
             {{ form.status.label }}
         </div>
@@ -188,7 +189,6 @@
     </div>
     
     <div class="input-container">
-
         <div class="columnlabel">
             {{ form.scope.label }}
         </div>
@@ -201,75 +201,30 @@
         <div class="columninput">
             {{ form.remark.data }}
         </div>
-
     </div>
 
-
-   
     <hr>
 
     <div class="detail-section" id="detail-section">
         <div class="detail-header">
-            <div class="detail-column width1">
-                Date
-            </div>
-            <div class="detail-column width1">
-                Follow Up
-            </div>
-            <div class="detail-column width3">
-                Note
-            </div>
-
+            <div class="detail-column"></div> <div class="detail-column">Date</div>
+            <div class="detail-column">Follow Up</div>
+            <div class="detail-column">Note</div>
         </div>
 
         {% if form.items %}
-            {# UPDATED LINE BELOW #}
             {% for item_form in form.items | sort(attribute='date.data', reverse=True) %}
                 <div class="detail-row">
-                    <div class="detail-column width1">
-                        {{ item_form.date.data }}
-                    </div>
-                    <div class="detail-column width1">
-                        {{ item_form.follow_up.data }}
-                    </div>
-                    <div class="detail-column width3">
-                        {{ item_form.note.data }}
-                    </div>
-
+                    <div class="detail-column"></div> <div class="detail-column">{{ item_form.date.data }}</div>
+                    <div class="detail-column">{{ item_form.follow_up.data }}</div>
+                    <div class="detail-column">{{ item_form.note.data }}</div>
                 </div>
             {% endfor %}
         {% else %}
-            <p>No items to display.</p>
+            <div class="detail-row"><div class="detail-column">No items to display.</div></div>
         {% endif %}
-        <!-- <div class="detail-header">
-
-            <div class="detail-column width1">
-                Date
-            </div>
-            <div class="detail-column width3">
-                Note
-            </div>
-        </div>
-
-        {% if form.items %}
-            {% for item_form in form.items %}
-                <div class="detail-row">
-
-                    <div class="detail-column width1">
-                        {{ item_form.date.data }}
-                    </div>
-                    <div class="detail-column width3">
-                        {{ item_form.note.data }}
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No items to display.</p>
-        {% endif %} -->
-
     </div>
 
     <hr>
-
 </div>
 {% endblock %}

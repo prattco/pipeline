@@ -1,0 +1,58 @@
+/* ==========================================================================
+   QuoteRequest Module Sub-Table Width Customization (static/css/quote_request.css)
+   ========================================================================== */
+
+/* 1. 액션 열 (마이너스 버튼 / 디스플레이용 번호 공백) */
+.quote-request-container .detail-column:nth-child(1) {
+    flex: 0 0 50px !important;
+    text-align: center;
+}
+
+/* 2. Material (자재 코드) */
+.quote-request-container .detail-column:nth-child(2) {
+    flex: 1.5 !important;
+    min-width: 110px;
+}
+
+/* 3. EAU (연간 예상 수량) */
+.quote-request-container .detail-column:nth-child(3) {
+    flex: 1 !important;
+    min-width: 80px;
+}
+
+/* 4. Vendor (공급 업체) */
+.quote-request-container .detail-column:nth-child(4) {
+    flex: 1.5 !important;
+    min-width: 110px;
+}
+
+/* 5. Price Term (Incoterm 조건) */
+.quote-request-container .detail-column:nth-child(5) {
+    flex: 1.2 !important;
+    min-width: 90px;
+}
+
+/* 6. Location (인코텀즈 목적지 수령 장소) */
+.quote-request-container .detail-column:nth-child(6) {
+    flex: 1.5 !important;
+    min-width: 110px;
+}
+
+/* 7. Target Price (목표 단가 가격) */
+.quote-request-container .detail-column:nth-child(7) {
+    flex: 1.2 !important;
+    min-width: 90px;
+}
+
+/* 8. Note (상세 요구 사항 비고) */
+.quote-request-container .detail-column:nth-child(8) {
+    flex: 3 !important; /* 서브 테이블에서 두 번째로 넓은 여백 제공 */
+    min-width: 200px;
+}
+
+/* 테이블 내부 input/select 높이 정렬 보정 */
+.quote-request-container .detail-column input,
+.quote-request-container .detail-column select,
+.quote-request-container .detail-column textarea {
+    height: 32px;
+}

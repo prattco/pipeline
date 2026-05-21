@@ -1,5 +1,7 @@
-/* --- Global Container & Input Styling --- */
-.form-group {
+/* ==========================================================================
+   Global Container & Input Styling (공통 스타일 시트)
+   ========================================================================== */
+   .form-group {
     max-width: 1100px;
     margin: 0 auto;
     background: #fff;
@@ -8,7 +10,7 @@
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
-/* Ensure inputs fill their containers but don't get absurdly wide in the top section */
+/* 상단 마스터 섹션의 인풋 요소 최대 크기 제한 */
 .columninput input, 
 .columninput select, 
 .columninput textarea {
@@ -55,7 +57,7 @@
     background-color: #ffffff;
 }
 
-/* --- Detail Section (Materials & Claim Items Table) --- */
+/* --- Detail Section (Sub-Grid Table Frame) --- */
 .detail-section {
     margin-top: 20px;
     border: 1px solid #e2e8f0;
@@ -80,53 +82,37 @@
     font-size: 0.75rem;
 }
 
-.detail-row:nth-child(even) { background-color: #f8fafc; }
-.detail-row:hover { background-color: #edf2f7; }
+.detail-row:nth-child(even) { 
+    background-color: #f8fafc; 
+}
+
+.detail-row:hover { 
+    background-color: #edf2f7; 
+}
 
 .detail-column {
     padding: 12px 10px;
-    flex: 1; /* Default growth for middle columns */
+    flex: 1; /* 전용 모듈 CSS가 정의되지 않았을 때의 최소 기본 확장값 설정 */
     min-width: 0;
     box-sizing: border-box;
 }
 
-/* --- Shared Column Width Logic (Applied to both forms) --- */
+/* --- 💡 클리닝 포인트: 모든 모듈이 공유하는 공통 열 규칙만 보존 --- */
 
-/* 1. Action Column (Delete Button / Index) */
+/* 1. 액션 열 (모든 모듈의 삭제 마이너스 아이콘 공통 적용) */
 .detail-column:nth-child(1) {
-    flex: 0 0 50px; 
+    flex: 0 0 50px !important;
     text-align: center;
 }
 
-/* 2. Date / Material Columns */
-.detail-column:nth-child(2) {
-    flex: 1.2; 
-}
-
-/* 3. EAU / Follow Up Columns */
-/* Narrowed for EAU in Quote Form, balanced for Date in Quality Form */
-.detail-column:nth-child(3) {
-    flex: 0.8; 
-    min-width: 80px;
-}
-
-/* 4. Vendor / Note Columns */
-.detail-column:nth-child(4) {
-    flex: 1.5;
-}
-
-/* 5. Incoterm / Note (Longer text areas) */
-.detail-column:last-child {
-    flex: 3; /* Always give the last column (usually Note) the most space */
-}
-
-/* Ensure inputs inside table fit perfectly */
+/* 테이블 내부 Form 컨트롤들이 그리드 칸 안에 꽉 차도록 유도 */
 .detail-column input, 
 .detail-column select,
 .detail-column textarea {
     width: 100% !important;
     max-width: 100% !important;
     padding: 6px;
+    box-sizing: border-box;
 }
 
 /* --- Button Styling --- */
@@ -158,6 +144,10 @@ hr {
     cursor: help;
 }
 
+/* --- 💡 클리닝 포인트: 모바일 768px 이하 해상도 반응형 버그 수정 --- */
 @media (max-width: 768px) {
-    .columnlabel, .columninput { flex: 0 0 100%; }
+    .columnlabel, .columninput { 
+        flex: 0 0 100% !important; 
+        width: 100% !important;
+    }
 }

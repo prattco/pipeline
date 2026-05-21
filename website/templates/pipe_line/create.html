@@ -1,8 +1,12 @@
-{% extends "base.html" %} {% block title %}Pipe Line{% endblock %} 
+{% extends "base.html" %} 
+{% block title %}Pipe Line{% endblock %} 
+
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/pipe_line.css') }}" />
+{% endblock %}
 
 {% block content %}
 <br/> 
 <h2 align="center">Create Pipe Line</h2>
 {% include("/pipe_line/_form.html") %}
 {% endblock %}
-

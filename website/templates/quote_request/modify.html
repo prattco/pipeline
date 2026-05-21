@@ -1,7 +1,11 @@
 {% extends "base.html" %} {% block title %}Quote Request{% endblock %} 
 
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/quote_request.css') }}" />
+{% endblock %}
+
 {% block content %}
 <br/> 
-<h2 align="center">Quote Request</h2>
+<h2 align="center">Quote Request Modify</h2>
 {% include("/quote_request/_form.html") %}
 {% endblock %}

@@ -1,5 +1,9 @@
 {% extends "base.html" %} {% block title %}Quality Claim{% endblock %} 
 
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/quality_claim.css') }}" />
+{% endblock %}
+
 {% block content %}
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
 <script type="text/javascript">
@@ -26,7 +30,7 @@
 <br/> 
 <h2 align="center">Quality Claim Display</h2>
 <br />
-<div class="form-group mx-sm-3 mb-2">
+<div class="form-group quality-claim-container mx-sm-3 mb-2">
     <div align="left">
         <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/quality_claim/modify/{{ form.id.data }}'">
         <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
@@ -34,12 +38,11 @@
     </div>
 </div>
 <br />
-<div class="form-group mx-sm-3 mb-2">
+<div class="form-group quality-claim-container mx-sm-3 mb-2">
 
     <div class="input-container">
         <div class="columnlabel">
             {{ form.status.label }}
-
         </div>
         <div class="columninput uneditable">
             {{ form.status.data }}
@@ -112,22 +115,6 @@
 
     <div class="input-container">
         <div class="columnlabel">
-            {{ form.model.label }}
-        </div>
-        <div class="columninput">
-            {{ form.model.data }}
-        </div>
-        <div class="columnlabel">
-            {{ form.type.label }}
-        </div>
-        <div class="columninput">
-            {{ form.type.data }}
-        </div>
-    </div>
-
-
-    <div class="input-container">
-        <div class="columnlabel">
             {{ form.issue.label }}
         </div>
         <div class="columninput">
@@ -136,68 +123,44 @@
         <div class="columnlabel">
             {{ form.corrective_action.label }}
         </div>
-
         <div class="columninput">
             {{ form.corrective_action.data }}  
         </div>
     </div>
 
     <div class="input-container">
-
         <div class="columnlabel">
             {{ form.closed_date.label }}
         </div>
         <div class="columninput">
             {{ form.closed_date.data }}
         </div>
-        <div class="columnlabel">
-
-        </div>
-        <div class="columninput">
-
-        </div>
-
+        <div class="columnlabel"></div>
+        <div class="columninput"></div>
     </div>
    
     <hr>
 
     <div class="detail-section" id="detail-section">
         <div class="detail-header">
-            <div class="detail-column width1">
-                Date
-            </div>
-            <div class="detail-column width1">
-                Follow Up
-            </div>
-            <div class="detail-column width3">
-                Note
-            </div>
-
+            <div class="detail-column"></div> <div class="detail-column">Date</div>
+            <div class="detail-column">Follow Up</div>
+            <div class="detail-column">Note</div>
         </div>
 
         {% if form.items %}
-            {# UPDATED LINE BELOW #}
             {% for item_form in form.items | sort(attribute='date.data', reverse=True) %}
                 <div class="detail-row">
-                    <div class="detail-column width1">
-                        {{ item_form.date.data }}
-                    </div>
-                    <div class="detail-column width1">
-                        {{ item_form.follow_up.data }}
-                    </div>
-                    <div class="detail-column width3">
-                        {{ item_form.note.data }}
-                    </div>
-
+                    <div class="detail-column"></div> <div class="detail-column">{{ item_form.date.data }}</div>
+                    <div class="detail-column">{{ item_form.follow_up.data }}</div>
+                    <div class="detail-column">{{ item_form.note.data }}</div>
                 </div>
             {% endfor %}
         {% else %}
-            <p>No items to display.</p>
+            <div class="detail-row"><div class="detail-column">No items to display.</div></div>
         {% endif %}
-
     </div>
 
     <hr>
-
 </div>
 {% endblock %}

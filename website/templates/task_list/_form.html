@@ -52,168 +52,164 @@
 
 </script>
 
-<form action="/task_list/save" method='POST' id="task_list_form" enctype="multipart/form-data">
-    <div align="left">
-        <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
-    </div>
-    <br />
-    <br />
-    {{ form.hidden_tag() }}
+<div class="task-list-container">
+    <form action="/task_list/save" method='POST' id="task_list_form" enctype="multipart/form-data">
+        <div align="left">
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
+        </div>
+        <br />
+        <br />
+        {{ form.hidden_tag() }}
 
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.status.label }}
-            <i class="fa fa-info-circle field-info" description="Status of the task"></i>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.status.label }}
+                <i class="fa fa-info-circle field-info" description="Status of the task"></i>
+            </div>
+            <div class="columninput">
+                {{ form.status() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.owner.label }}
+                <i class="fa fa-info-circle field-info" description="Owner of the task"></i>
+            </div>
+            <div class="columninput">
+                {{ form.owner() }}
+            </div>
         </div>
-        <div class="columninput">
-            {{ form.status() }}
-        </div>
-        <div class="columnlabel">
-            {{ form.owner.label }}
-            <i class="fa fa-info-circle field-info" description="Owner of the task"></i>
-        </div>
-        <div class="columninput">
-            {{ form.owner() }}
-        </div>
-    </div>
 
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.customer.label }}
-            <i class="fa fa-info-circle field-info" description="Name of Customer"></i>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.customer.label }}
+                <i class="fa fa-info-circle field-info" description="Name of Customer"></i>
+            </div>
+            <div class="columninput">
+                {{ form.customer() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.customer_prospect.label }}
+                <i class="fa fa-info-circle field-info" description="Select Customer or Prospect"></i>
+            </div>
+            <div class="columninput">
+                {{ form.customer_prospect() }}
+            </div>
         </div>
-        <div class="columninput">
-            {{ form.customer() }}
-        </div>
-        <div class="columnlabel">
-            {{ form.customer_prospect.label }}
-            <i class="fa fa-info-circle field-info" description="Select Customer or Prospect"></i>
-        </div>
-        <div class="columninput">
-            {{ form.customer_prospect() }}
-        </div>
-    </div>
 
-    <div class="input-container">
-        <div class="columnlabel">
-            {{ form.project.label }}
-            <i class="fa fa-info-circle field-info" description="Describe the project"></i>
+        <div class="input-container">
+            <div class="columnlabel">
+                {{ form.project.label }}
+                <i class="fa fa-info-circle field-info" description="Describe the project"></i>
+            </div>
+            <div class="columninput">
+                {{ form.project() }}
+            </div>
+            <div class="columnlabel">
+                {{ form.remark.label }}
+                <i class="fa fa-info-circle field-info" description="Leave a note"></i>
+            </div>
+            <div class="columninput">
+                {{ form.remark() }}
+            </div>
         </div>
-        <div class="columninput">
-            {{ form.project() }}
-        </div>
-        <div class="columnlabel">
-            {{ form.remark.label }}
-            <i class="fa fa-info-circle field-info" description="Leave a note"></i>
-        </div>
-        <div class="columninput">
-            {{ form.remark() }}
-        </div>
-    </div>
 
-    <div class="input-container" style="margin-top: 4px;">
-        <div class="columnlabel" style="background-color: #f1f5f9; font-weight: bold; border-left: 3px solid #10b981;">
-            <i class="fa fa-paperclip"></i> ATTACHMENTS (Max 5)
-        </div>
-        <div class="columninput_wide" style="padding: 12px; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; display: grid; grid-template-columns: 1fr; gap: 10px;">
-            
-            {% for i in range(1, 6) %}
+        <div class="input-container" style="margin-top: 4px;">
+            <div class="columnlabel" style="background-color: #f1f5f9; font-weight: bold; border-left: 3px solid #10b981;">
+                <i class="fa fa-paperclip"></i> ATTACHMENTS (Max 5)
+            </div>
+            <div class="columninput_wide" style="padding: 12px; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 4px; display: grid; grid-template-columns: 1fr; gap: 10px;">
                 
-                {% set field_name = 'attachment_' ~ i %}
-                {% set form_field = form[field_name] %}
-                {% set db_val = form_field.data if form_field and form_field.data else none %}
-                
-                {% set filename = "" %}
-                {% set hyperlink = "#" %}
-                
-                {% if db_val and '||URL_INFO_' in db_val %}
-                    {% set parts = db_val.split('||URL_INFO_' ~ i ~ ':') %}
-                    {% set filename = parts[0].strip() %}
-                    {% set hyperlink = parts[1].strip() if parts|length > 1 else "#" %}
-                {% endif %}
-
-                <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; {% if i > 1 %}border-top: 1px dashed #e2e8f0; padding-top: 8px;{% endif %}">
-                    <span style="font-size: 0.8rem; font-weight: bold; color: #475569; min-width: 50px;">File {{ i }}:</span>
+                {% for i in range(1, 6) %}
                     
-                    {% if filename %}
-                        <div style="display: inline-flex; align-items: center; gap: 6px; background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 3px 10px; border-radius: 4px; font-size: 0.82rem;">
-                            <i class="fa fa-link" style="color: #16a34a;"></i>
-                            <a href="{{ hyperlink }}" target="_blank" title="View original file on SharePoint" style="color: #1d4ed8; font-weight: 600; text-decoration: underline;">
-                                {{ filename }}
-                            </a>
-                            <span style="color: #bbf7d0; margin: 0 2px;">|</span>
-                            <span style="color: #15803d; font-size: 0.75rem; font-weight: bold;"><i class="fa fa-check-circle"></i> File Preserved</span>
-                        </div>
-                        <span style="font-size: 0.78rem; color: #94a3b8; font-style: italic;">(Select file on the right only to replace):</span>
+                    {% set field_name = 'attachment_' ~ i %}
+                    {% set form_field = form[field_name] %}
+                    {% set db_val = form_field.data if form_field and form_field.data else none %}
+                    
+                    {% set filename = "" %}
+                    {% set hyperlink = "#" %}
+                    
+                    {% if db_val and '||URL_INFO_' in db_val %}
+                        {% set parts = db_val.split('||URL_INFO_' ~ i ~ ':') %}
+                        {% set filename = parts[0].strip() %}
+                        {% set hyperlink = parts[1].strip() if parts|length > 1 else "#" %}
                     {% endif %}
 
-                    <input type="file" id="attachment_{{ i }}" name="attachment_{{ i }}" class="form-control-file" style="font-size: 0.82rem; max-width: 280px;">
+                    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px; {% if i > 1 %}border-top: 1px dashed #e2e8f0; padding-top: 8px;{% endif %}">
+                        <span style="font-size: 0.8rem; font-weight: bold; color: #475569; min-width: 50px;">File {{ i }}:</span>
+                        
+                        {% if filename %}
+                            <div style="display: inline-flex; align-items: center; gap: 6px; background-color: #f0fdf4; border: 1px solid #bbf7d0; padding: 3px 10px; border-radius: 4px; font-size: 0.82rem;">
+                                <i class="fa fa-link" style="color: #16a34a;"></i>
+                                <a href="{{ hyperlink }}" target="_blank" title="View original file on SharePoint" style="color: #1d4ed8; font-weight: 600; text-decoration: underline;">
+                                    {{ filename }}
+                                </a>
+                                <span style="color: #bbf7d0; margin: 0 2px;">|</span>
+                                <span style="color: #15803d; font-size: 0.75rem; font-weight: bold;"><i class="fa fa-check-circle"></i> File Preserved</span>
+                            </div>
+                            <span style="font-size: 0.78rem; color: #94a3b8; font-style: italic;">(Select file on the right only to replace):</span>
+                        {% endif %}
+
+                        <input type="file" id="attachment_{{ i }}" name="attachment_{{ i }}" class="form-control-file" style="font-size: 0.82rem; max-width: 280px;">
+                    </div>
+                {% endfor %}
+                
+                <small class="form-text text-muted" style="margin-top: 6px; color: #475569; font-size: 0.78rem; border-top: 1px dashed #e2e8f0; padding-top: 6px; line-height: 1.4;">
+                    * **Attachment Status Guide:** Slots with an already registered file will display a green label. You only need to browse and select a new file for the slots you wish to change (update). For file slots that do not require any changes, simply leave the file chooser empty, and the original file will be safely preserved.
+                </small>
+            </div>
+        </div>
+
+        <hr>
+
+        <div align="center">
+            <input type="button" class="btn btn-primary btn-sm" onclick="addLine()" value="ADD ITEM" />
+        </div>
+
+        <br>
+
+        <div class="detail-section form-table" id="detail-section">
+            <div class="detail-header">
+                <div class="detail-column">Action</div>
+                <div class="detail-column">Date</div>
+                <div class="detail-column">Note</div>
+            </div>
+
+            {% for item_form in form.items %}
+            <div class="detail-row" index="{{ loop.index0 }}">
+                <div class="detail-column">
+                    {{ item_form.hidden_tag() }}
+                    <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
                 </div>
+                <div class="detail-column">
+                    {{ item_form.date() }}
+                </div>
+                <div class="detail-column">
+                    {{ item_form.note() }}
+                </div>
+            </div>
             {% endfor %}
-            
-            <small class="form-text text-muted" style="margin-top: 6px; color: #475569; font-size: 0.78rem; border-top: 1px dashed #e2e8f0; padding-top: 6px; line-height: 1.4;">
-                * **Attachment Status Guide:** Slots with an already registered file will display a green label. You only need to browse and select a new file for the slots you wish to change (update). For file slots that do not require any changes, simply leave the file chooser empty, and the original file will be safely preserved.
-            </small>
         </div>
-    </div>
-
-    <hr>
-
-    <div align="center">
-        <input type="button" class="btn btn-primary btn-sm" onclick="addLine()" value="ADD ITEM" />
-    </div>
-
-    <br>
-
-    <div id="detail-section">
-        <div class="detail-header">
-            <div class="detail-column width1">Action</div>
-            <div class="detail-column width1">Date</div>
-
-            <div class="detail-column width3">Note</div>
+        
+        <hr>
+        <br />
+        
+        <div align="center">
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
         </div>
 
-        {% for item_form in form.items %}
-        <div class="detail-row" index="{{ loop.index0 }}">
-            <div class="detail-column width1">
+        <br /><br /><br /><br />
+    </form>
+
+    <div style="display: none;">
+        <div class="detail-row" id="insert_row" index="">
+            <div class="detail-column">
                 <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
             </div>
-            <div class="detail-column width1">
-                {{ item_form.date() }}
+            <div class="detail-column">
+                {{ item_form_template.date() }}
             </div>
-
-            <div class="detail-column width3">
-                {{ item_form.note() }}
+            <div class="detail-column">
+                {{ item_form_template.note() }}
             </div>
         </div>
-        {% endfor %}
-    </div>
-    
-    <hr>
-    <br />
-    
-    <div align="center">
-        <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
-    </div>
-
-    <br />
-    <br />
-    <br />
-    <br />
-</form>
-
-<div style="display: none;">
-    <div class="detail-row" id="insert_row" index="">
-        <div class="detail-column width1">
-            <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
-        </div>
-        <div class="detail-column width1">
-            {{ item_form_template.date() }}
-        </div>
-
-        <div class="detail-column width3">
-            {{ item_form_template.note() }}
-        </div>
-
     </div>
 </div>

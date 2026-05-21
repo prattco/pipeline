@@ -1,8 +1,11 @@
 {% extends "base.html" %} {% block title %}Task List{% endblock %} 
 
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/task_list.css') }}" />
+{% endblock %}
+
 {% block content %}
 <br/> 
 <h2 align="center">Create Task</h2>
 {% include("/task_list/_form.html") %}
 {% endblock %}
-

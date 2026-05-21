@@ -1,0 +1,39 @@
+/* ==========================================================================
+   CommLog Module Table Width Customization
+   ========================================================================== */
+
+/* 1. 액션 열 (마이너스 버튼 / 디스플레이용 공백) */
+.comm-log-container .detail-column:nth-child(1) {
+    flex: 0 0 50px !important;
+    text-align: center;
+}
+
+/* 2. Communication Date (날짜 필드) */
+.comm-log-container .detail-column:nth-child(2) {
+    flex: 0 0 130px !important; /* 날짜가 깨지지 않는 고정 크기 할당 */
+}
+
+/* 3. Contact (고객 담당자) */
+.comm-log-container .detail-column:nth-child(3) {
+    flex: 1.5 !important;
+    min-width: 120px;
+}
+
+/* 4. Method (Phone, Email, Meeting 등) */
+.comm-log-container .detail-column:nth-child(4) {
+    flex: 1.2 !important;
+    min-width: 100px;
+}
+
+/* 5. Note (가장 길게 보여야 할 텍스트 공간) */
+.comm-log-container .detail-column:nth-child(5) {
+    flex: 4 !important; /* 남은 공간을 가장 많이 할당 */
+    min-width: 300px;
+}
+
+/* 폼 내부 textarea 높이 최적화 */
+.comm-log-container .detail-column textarea {
+    resize: vertical;
+    height: 34px;
+    min-height: 34px;
+}

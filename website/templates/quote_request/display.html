@@ -1,6 +1,10 @@
 {% extends "base.html" %} 
 {% block title %}Quote Request Display{% endblock %} 
 
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/quote_request.css') }}" />
+{% endblock %}
+
 {% block content %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/form_style.css') }}" />
 
@@ -24,13 +28,11 @@
     }
 </script>
 
-
-
 <br/> 
 <h2 align="center">Quote Request Display</h2>
 <br />
 
-<div class="form-group mx-sm-3 mb-2">
+<div class="form-group quote-request-container mx-sm-3 mb-2">
     <div align="left" style="margin-bottom: 20px;">
         <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/quote_request/modify/{{ form.id.data }}'">
         <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
@@ -74,25 +76,28 @@
 
     <br/>
     <h5 style="color: #4a5568; margin-left: 10px;">Requested Materials</h5>
+    
     <div class="detail-section">
         <div class="detail-header">
-            <div class="detail-column" style="flex: 0 0 50px;">#</div>
+            <div class="detail-column">#</div>
             <div class="detail-column">Material</div>
             <div class="detail-column">EAU</div>
             <div class="detail-column">Vendor</div>
             <div class="detail-column">Price Term</div>
+            <div class="detail-column">Location</div>
             <div class="detail-column">Target Price</div>
-            <div class="detail-column" style="flex: 2;">Note</div>
+            <div class="detail-column">Note</div>
         </div>
         {% for item in form.items %}
         <div class="detail-row">
-            <div class="detail-column" style="flex: 0 0 50px;">{{ item.item_line.data }}</div>
+            <div class="detail-column">{{ item.item_line.data }}</div>
             <div class="detail-column">{{ item.material.data }}</div>
             <div class="detail-column">{{ item.eau.data }}</div>
             <div class="detail-column">{{ item.vendor.data }}</div>
-            <div class="detail-column">{{ item.incoterm.data }} - {{ item.incoterm_location.data }}</div>
+            <div class="detail-column">{{ item.incoterm.data }}</div>
+            <div class="detail-column">{{ item.incoterm_location.data }}</div>
             <div class="detail-column">${{ item.target_price.data }}</div>
-            <div class="detail-column" style="flex: 2;">{{ item.note.data }}</div>
+            <div class="detail-column">{{ item.note.data }}</div>
         </div>
         {% endfor %}
     </div>

@@ -1,6 +1,3 @@
-
-
-
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -20,7 +17,6 @@ function addLine() {
 
     insertRow.attr("index", index);
 
-    // Matches the field names in your QuoteRequestItem model
     indexingItem("material", insertRow);
     indexingItem("eau", insertRow);
     indexingItem("vendor", insertRow);
@@ -33,42 +29,25 @@ function addLine() {
     refInputSetup(insertRow);        
 }
 
+function indexingItem(name, row) {
+    var index = row.attr("index");
+    var item_name_prefix = 'items-' + index;
+    var item = $('#' + name, row);
+    item.attr('id', item_name_prefix + "-" + item.attr('name'));
+    item.attr('name', item_name_prefix + "-" + item.attr('name'));
+}
 
-    function indexingItem(name, row) {
-        var index = row.attr("index");
-        var item_name_prefix = 'items-' + index;
-        var item = $('#' + name, row);
-        item.attr('id', item_name_prefix + "-" + item.attr('name'));
-        item.attr('name', item_name_prefix + "-" + item.attr('name'));
-    }
-
-
-    // // FIXED CODE
-    // function indexingItem(name, row) {
-    //     var index = row.attr("index");
-    //     var item_name_prefix = 'items-' + index; 
-    //     var item = $('#' + name, row);
-        
-    //     // Flask-WTF FieldList expects: items-0-target_price
-    //     // Note: ensure the template's 'name' attribute is just the field name (e.g., 'target_price')
-    //     var fieldName = item.attr('name'); 
-        
-    //     item.attr('id', item_name_prefix + '-' + fieldName);
-    //     item.attr('name', item_name_prefix + '-' + fieldName);
-    // }
-
-
-
-    function deleteRow(obj) {
-        var row = $(obj).parent().parent();
-        row.remove();
-    }
+function deleteRow(obj) {
+    var row = $(obj).parent().parent();
+    row.remove();
+}
 </script>
 
 {% include("/common/common_include.html") %}
 {% include("/common/display_errors.html") %}
 <br />
-<div align="center" class="form-group mx-sm-3 mb-2">
+
+<div align="center" class="form-group quote-request-container mx-sm-3 mb-2">
     <form action="/quote_request/save" method='POST' id="quote_request_form">
         <div align="left">
             <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
@@ -102,7 +81,7 @@ function addLine() {
             </div>
             <div class="columnlabel">
                 {{ form.location.label }}
-                <i class="fa fa-info-circle field-info" description="Where is the manuefacturing facility?"></i>
+                <i class="fa fa-info-circle field-info" description="Where is the manufacturing facility?"></i>
             </div>
             <div class="columninput">
                 {{ form.location() }}
@@ -141,134 +120,112 @@ function addLine() {
             </div>
         </div>
 
-    
         <hr>
-
 
         <div align="center">
             <input type="button" class="btn btn-primary btn-sm" onclick="addLine()" value="ADD ITEM" />
         </div>
         <br />
+        
         <div class="detail-section" id="detail-section">
             <div class="detail-header">
-                <div class="detail-column width1" >
-                </div>
-                <div class="detail-column width1">
+                <div class="detail-column"></div>
+                <div class="detail-column">
                     {{ item_form_template.material.label }}
                     <i class="fa fa-info-circle field-info" description="Material code"></i>
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form_template.eau.label }}
                     <i class="fa fa-info-circle field-info" description="Estimated Annual Usage"></i>
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form_template.vendor.label }}
                     <i class="fa fa-info-circle field-info" description="Vendor name"></i>
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form_template.incoterm.label }}
                     <i class="fa fa-info-circle field-info" description="Incoterm"></i>
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form_template.incoterm_location.label }}
                     <i class="fa fa-info-circle field-info" description="Incoterm location"></i>
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form_template.target_price.label }}
-                    <i class="fa fa-info-circle field-info" description="target_price"></i>
+                    <i class="fa fa-info-circle field-info" description="Target Price"></i>
                 </div>
-
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form_template.note.label }}
-                    <i class="fa fa-info-circle field-info" description="note."></i>
+                    <i class="fa fa-info-circle field-info" description="Note."></i>
                 </div>
             </div>
             {% for item_form in form.items %}
             <div class="detail-row" index="{{loop.index0}}">
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form.hidden_tag() }}
                     <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form.material() }}
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form.eau() }}
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form.vendor() }}
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form.incoterm() }}
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form.incoterm_location() }}
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form.target_price() }}
                 </div>
-                <div class="detail-column width1">
+                <div class="detail-column">
                     {{ item_form.note() }}
                 </div>
-
             </div>
-
             {% endfor %}
-
         </div>
 
         <hr>
 
         <br />
         <div align="center">
-
             <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
         </div>
 
-        <br />
-        <br />
-        <br />
-        <br />
+        <br /><br /><br /><br />
     </form>
 
     <div style="display: none;">
         <div class="detail-row" id="insert_row" index="">
-            <div class="detail-column width1">
+            <div class="detail-column">
                 <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
             </div>
-
-            
-            <div class="detail-column width1">
+            <div class="detail-column">
                 {{ item_form_template.material() }}
             </div>
-            <div class="detail-column width1">
+            <div class="detail-column">
                 {{ item_form_template.eau() }}
             </div>
-
-            <div class="detail-column width1">
+            <div class="detail-column">
                 {{ item_form_template.vendor() }}
             </div>
-
-            <div class="detail-column width1">
+            <div class="detail-column">
                 {{ item_form_template.incoterm() }}
             </div>
-
-            <div class="detail-column width1">
+            <div class="detail-column">
                 {{ item_form_template.incoterm_location() }}
             </div>
-
-            <div class="detail-column width1">
+            <div class="detail-column">
                 {{ item_form_template.target_price() }}
             </div>
-            
-            <div class="detail-column width1">
+            <div class="detail-column">
                 {{ item_form_template.note() }}
             </div>
-
         </div>
     </div>
-</div>
-
-    <ul>
-    </ul>
 </div>
