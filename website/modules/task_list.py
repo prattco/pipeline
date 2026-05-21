@@ -316,7 +316,18 @@ def saveAction(form):
             if removeItem: db.session.delete(removeItem)
 
         # 1. 폼 기본 일반 데이터 객체 주입
-        excluded_keys = ['id', 'items', 'csrf_token', 'attachment_1', 'attachment_2', 'attachment_3', 'attachment_4', 'attachment_5']
+        excluded_keys = [
+            'id', 
+            'items',
+            'csrf_token',
+            'attachment_1',
+            'attachment_2',
+            'attachment_3',
+            'attachment_4',
+            'attachment_5',
+            'created_user'
+             ]
+
         for fieldname, field in form._fields.items():
             if fieldname not in excluded_keys:
                 setattr(task_list_obj, fieldname, field.data)
