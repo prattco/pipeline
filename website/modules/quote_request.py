@@ -221,7 +221,7 @@ def do_quote_request_save():
 
 def sendNotification(obj, is_new=True):
     EMAIL_FROM = "no-reply@chicagolandcfs.com"
-    RECIPIENTS = ["danny.yun@prattco.com", "david.jeon@prattco.com"]
+    RECIPIENTS = ["danny.yun@prattco.com", "david.jeon@prattco.com", "sungsoon.jang@prattco.com"]
 
 # 1. Pull the email from the User table using the ID stored in obj.created_user
     if hasattr(obj, 'created_user') and obj.created_user:
