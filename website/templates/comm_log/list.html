@@ -8,22 +8,16 @@
 <br/>
 
 <div style="text-align: center;">
-
     <form action="" method="POST" align="center">
-        <input type="button" class="btn btn-primary btn-sm" onclick="location.href='/comm_log/create'"
-        value="CREATE COMM LOG" />
-        <!-- <button formaction="/download" type="submit" class="btn btn-primary btn-sm">DOWNLOAD</button> -->
+        <input type="button" class="btn btn-primary btn-sm" onclick="location.href='/comm_log/create'" value="CREATE COMM LOG" />
     </form>
-
 </div>
 
 <br />
 <br/>
 <h6 align="center">Select fields to display.</h6>
 
-
 <div style="text-align: center; margin-bottom: 20px;">
-    <!-- <label for="column-selector">Select Columns to Display:</label> -->
     <select id="column-selector" multiple="multiple" style="width: 400px;">
         <option value="0" selected>Status</option>
         <option value="1" selected>Customer</option>
@@ -41,14 +35,14 @@
         <option value="12" >Office 1</option>
         <option value="13" >Note 1</option>
 
-        <option value="14" >Contact 2</option>
+        <option value="14" selected>Contact 2</option>
         <option value="15" >Title 2</option>
         <option value="16" >Email 2</option>
         <option value="17" >Phone 2</option>
         <option value="18" >Office 2</option>
         <option value="19" >Note 2</option>
 
-        <option value="20" >Contact 3</option>
+        <option value="20" selected>Contact 3</option>
         <option value="21" >Title 3</option>
         <option value="22" >Email 3</option>
         <option value="23" >Phone 3</option>
@@ -74,11 +68,11 @@
 
         <option value="40" selected>Latest Note</option>
         <option value="41" selected>Latest Date</option>
-
     </select>
 </div>
+
 <div style="display: flex; justify-content: center;">
-    <table id="list" class="display stripe compact" style="width: 95%; ">
+    <table id="list" class="display stripe compact" style="width: 95%;">
         <thead>
             <tr>
                 <th>Status</th>
@@ -130,11 +124,10 @@
 
                 <th>Latest Note</th>
                 <th>Latest Date</th>
-
             </tr>
             <tr>
-                <th ><input type="text" data-column="0" class="filter-input" placeholder="Filter Status"></th>
-                <th ><input type="text" data-column="1" class="filter-input" placeholder="Filter Customer"></th>
+                <th><input type="text" data-column="0" class="filter-input" placeholder="Filter Status"></th>
+                <th><input type="text" data-column="1" class="filter-input" placeholder="Filter Customer"></th>
                 <th><input type="text" data-column="2" class="filter-input" placeholder="Filter Owner"></th>
                 <th><input type="text" data-column="3" class="filter-input" placeholder="Filter Application"></th>
                 <th><input type="text" data-column="4" class="filter-input" placeholder="Filter Address"></th>
@@ -182,149 +175,61 @@
 
                 <th><input type="text" data-column="40" class="filter-input" placeholder="Filter Latest Note"></th>
                 <th><input type="text" data-column="41" class="filter-input" placeholder="Filter Latest Date"></th>
-
             </tr>
         </thead>
 
         <tbody>
             {% for comm_log in comm_logs %}
             <tr>
-                <td>
-                    {{ comm_log.status }}
-                </td>
-                <td>
-                    <a href="/comm_log/display/{{ comm_log.id }}">{{ comm_log.customer }}</a>
-                </td>
-                <td>
-                    {{ comm_log.owner }}
-                </td>
-                <td>
-                    {{ comm_log.application }}
-                </td>
-                <td>
-                    {{ comm_log.address }}</a>
-                </td>
-                <td>
-                    {{ comm_log.city }}
-                </td>
-                <td>
-                    {{ comm_log.state }}
-                </td>
-                <td>
-                    {{ comm_log.zip }}
-                </td>
+                <td>{{ comm_log.status }}</td>
+                <td><a href="/comm_log/display/{{ comm_log.id }}">{{ comm_log.customer }}</a></td>
+                <td>{{ comm_log.owner }}</td>
+                <td>{{ comm_log.application }}</td>
+                <td>{{ comm_log.address }}</td>
+                <td>{{ comm_log.city }}</td>
+                <td>{{ comm_log.state }}</td>
+                <td>{{ comm_log.zip }}</td>
 
+                <td>{{ comm_log.contact1 }}</td>
+                <td>{{ comm_log.title1 }}</td>
+                <td>{{ comm_log.email1 }}</td>
+                <td>{{ comm_log.phone1 }}</td>
+                <td>{{ comm_log.office1 }}</td>
+                <td>{{ comm_log.cnote1 }}</td>
 
-                <td>
-                    {{ comm_log.contact1 }}
-                </td>
-                <td>
-                    {{ comm_log.title1 }}
-                </td>
-                <td>
-                    {{ comm_log.email1 }}
-                </td>
-                <td>
-                    {{ comm_log.phone1 }}
-                </td>
-                <td>
-                    {{ comm_log.office1 }}
-                </td>
-                <td>
-                    {{ comm_log.cnote1 }}
-                </td>
+                <td>{{ comm_log.contact2 }}</td>
+                <td>{{ comm_log.title2 }}</td>
+                <td>{{ comm_log.email2 }}</td>
+                <td>{{ comm_log.phone2 }}</td>
+                <td>{{ comm_log.office2 }}</td>
+                <td>{{ comm_log.cnote2 }}</td>
 
-                <td>
-                    {{ comm_log.contact2 }}
-                </td>
-                <td>
-                    {{ comm_log.title2 }}
-                </td>
-                <td>
-                    {{ comm_log.email2 }}
-                </td>
-                <td>
-                    {{ comm_log.phone2 }}
-                </td>
-                <td>
-                    {{ comm_log.office2 }}
-                </td>
-                <td>
-                    {{ comm_log.cnote2 }}
-                </td>
+                <td>{{ comm_log.contact3 }}</td>
+                <td>{{ comm_log.title3 }}</td>
+                <td>{{ comm_log.email3 }}</td>
+                <td>{{ comm_log.phone3 }}</td>
+                <td>{{ comm_log.office3 }}</td>
+                <td>{{ comm_log.cnote3 }}</td>
 
-                <td>
-                    {{ comm_log.contact3 }}
-                </td>
-                <td>
-                    {{ comm_log.title3 }}
-                </td>
-                <td>
-                    {{ comm_log.email3 }}
-                </td>
-                <td>
-                    {{ comm_log.phone3 }}
-                </td>
-                <td>
-                    {{ comm_log.office3 }}
-                </td>
-                <td>
-                    {{ comm_log.cnote3 }}
-                </td>
+                <td>{{ comm_log.contact4 }}</td>
+                <td>{{ comm_log.title4 }}</td>
+                <td>{{ comm_log.email4 }}</td>
+                <td>{{ comm_log.phone4 }}</td>
+                <td>{{ comm_log.office4 }}</td>
+                <td>{{ comm_log.cnote4 }}</td>
 
-                <td>
-                    {{ comm_log.contact4 }}
-                </td>
-                <td>
-                    {{ comm_log.title4 }}
-                </td>
-                <td>
-                    {{ comm_log.email4 }}
-                </td>
-                <td>
-                    {{ comm_log.phone4 }}
-                </td>
-                <td>
-                    {{ comm_log.office4 }}
-                </td>
-                <td>
-                    {{ comm_log.cnote4 }}
-                </td>
+                <td>{{ comm_log.contact5 }}</td>
+                <td>{{ comm_log.title5 }}</td>
+                <td>{{ comm_log.email5 }}</td>
+                <td>{{ comm_log.phone5 }}</td>
+                <td>{{ comm_log.office5 }}</td>
+                <td>{{ comm_log.cnote5 }}</td>
 
-                <td>
-                    {{ comm_log.contact5 }}
-                </td>
-                <td>
-                    {{ comm_log.title5 }}
-                </td>
-                <td>
-                    {{ comm_log.email5 }}
-                </td>
-                <td>
-                    {{ comm_log.phone5 }}
-                </td>
-                <td>
-                    {{ comm_log.office5 }}
-                </td>
-                <td>
-                    {{ comm_log.cnote5 }}
-                </td>
-
-                <td>
-                    {{ comm_log.launch_date }}
-                </td>
-                <td>
-                    {{ comm_log.remark }}
-                </td>
-
-                <td>
-                    {{ comm_log.latest_note }}
-                </td>
-                <td>
-                    {{ comm_log.latest_date }}
-                </td>
-
-
+                <td>{{ comm_log.launch_date }}</td>
+                <td>{{ comm_log.remark }}</td>
+      
+                <td>{{ comm_log.latest_note | safe }}</td>
+                <td>{{ comm_log.latest_date }}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -339,7 +244,6 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        // Initialize DataTable
         var table = $('#list').DataTable({
             paging: true,
             searching: true,
@@ -347,24 +251,14 @@
             order: [[41, 'desc']], 
             pageLength: 100,
             autoWidth: false, 
-            // columnDefs: [
-            //     { targets: '_all', className: 'dt-body-left'},
-            //     // Width adjustments for 15 columns (Indices 0-14)
-            //     { targets: [0, 2, 3, 5, 12, 14], width: '5%' },   // Status, Dates, App, Type
-            //     { targets: [1, 4, 6, 8, 9], width: '7%' },      // IDs, Customer, Model
-            //     { targets: 7, width: '10%' },                    // Failure Location
-            //     { targets: [10, 11, 13], width: '15%' },         // Long text fields (Issue, Action, Note)
-            // ],
             responsive: true
         });
     
-        // Initialize Select2
         $('#column-selector').select2({
             placeholder: "Select columns",
             allowClear: true
         });
     
-        // Function to update column visibility
         function updateColumnVisibility() {
             var selectedColumns = $('#column-selector').val() || [];
             var selectedColumnIndices = selectedColumns.map(Number);
@@ -372,7 +266,6 @@
             table.columns().every(function(index) {
                 var isVisible = selectedColumnIndices.includes(index);
                 this.visible(isVisible);
-                // Sync visibility of the filter inputs in the second header row
                 $('.filter-input[data-column="' + index + '"]').closest('th').toggle(isVisible);
             });
         }
@@ -381,7 +274,6 @@
             updateColumnVisibility();
         });
     
-        // Default Status filter (Index 0)
         const statusColumnIndex = 0; 
         const defaultStatusFilterValue = ''; 
     
@@ -390,7 +282,6 @@
         var regex = filterValues.join('|');
         table.column(statusColumnIndex).search(regex, true, false).draw();
     
-        // Individual Column Filtering logic
         $('.filter-input').on('keyup', function () {
             var colIdx = $(this).data('column');
             var filterVal = this.value;
@@ -403,9 +294,8 @@
                 .draw();
         });
     
-        // Run visibility check on load
         updateColumnVisibility();
     });
-    </script>
+</script>
 
 {% endblock %}

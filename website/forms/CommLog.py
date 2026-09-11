@@ -11,11 +11,12 @@ from sqlalchemy import text
 
 from ..models import CommLog, CommLogItem
 
+
 class CommLogItemForm(FlaskForm):
     id = HiddenField()
     comm_log_id = HiddenField()
     item_line = IntegerField("Item Line")
-    date = DateField("Date", format='%Y-%m-%d',validators=[DataRequired()])
+    date = DateField("Date", format='%Y-%m-%d', validators=[DataRequired()])
     contact = StringField("Contact")
     method = SelectField("Method", 
                         choices=[('Phone', 'Phone'), 
@@ -25,7 +26,8 @@ class CommLogItemForm(FlaskForm):
                                  ], 
                         validators=[DataRequired()])
     note = TextAreaField("Note")
-
+    
+    # 💡 [추가] 별도의 FileField 대신 WTForms 기본 처리를 위한 필드 혹은 템플릿 처리 준비
     class Meta:
         csrf = False
 

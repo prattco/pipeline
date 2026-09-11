@@ -4,24 +4,29 @@
 
 /* 1. 액션 열 (마이너스 버튼 / 디스플레이용 공백) */
 .pipe-line-container .detail-column:nth-child(1) {
-    flex: 0 0 50px !important;
+    flex: 0 0 30px !important;
     text-align: center;
 }
 
 /* 2. Date (커뮤니케이션 일자) */
 .pipe-line-container .detail-column:nth-child(2) {
-    flex: 0 0 140px !important; /* 날짜 인풋 박스가 깨지지 않도록 고정폭 보장 */
+    flex: 0 0 110px !important; 
 }
 
 /* 3. Follow Up (후속 조치 예정일) */
 .pipe-line-container .detail-column:nth-child(3) {
-    flex: 0 0 140px !important; /* 날짜 인풋 박스 고정폭 보장 */
+    flex: 0 0 110px !important; 
 }
 
-/* 4. Note (가장 길게 채워질 상담 내역 및 특이사항) */
+/* 4. Note (가장 길게 채워질 상담 내역) */
 .pipe-line-container .detail-column:nth-child(4) {
-    flex: 5 !important; /* 남은 잔여 가로 영역을 전부 몰아주기 */
-    min-width: 350px;
+    flex: 1 1 auto !important; /* 남은 잔여 공간을 모두 Note에 할당 */
+    min-width: 250px;
+}
+
+/* 5. Attachment (첨부파일) */
+.pipe-line-container .detail-column:nth-child(5) {
+    flex: 0 0 160px !important; /* 첨부파일 버튼용 고정 폭 */
 }
 
 /* 테이블 내부 textarea 최적화 */

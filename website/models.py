@@ -21,13 +21,18 @@ def note_on_delete_cascade(mapper, connection, target):
     Note.query.filter(Note.ref_id==target.id).delete()
 
 class User(db.Model, UserMixin):
-    __tablename__ = 'user_p'  # <--- UPDATED: Explicit table name
+    __tablename__ = 'user_p'  
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(150), unique=True)
     password = db.Column(db.Text)
     company_name = db.Column(db.String(None))
     first_name = db.Column(db.String(None))
     vendor = db.Column(db.String(None))
+    
+    # 💡 [추가] 권한 제어를 위한 컬럼 매핑
+    role = db.Column(db.String(None))
+    supervisor = db.Column(db.Integer, nullable=True)
+    
     # Relationship to Note
     notes = db.relationship('Note', back_populates='user')
     created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
@@ -96,6 +101,7 @@ class PipeLineItem(db.Model):
     date = db.Column(db.Date, default=func.getdate())
     follow_up = db.Column(db.Date)
     note = db.Column(db.String(None)) 
+    attachment_file_meta = db.Column(db.String(None))
     
     # Updated FKs to point to user_p
     created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
@@ -178,7 +184,7 @@ event.listen(CommLog, 'before_insert', before_insert_listener)
 event.listen(CommLog, 'before_update', before_update_listener)
 
 class CommLogItem(db.Model):
-    __tablename__ = 'comm_log_item' # Explicit naming
+    __tablename__ = 'comm_log_item' 
     id = db.Column(db.Integer, primary_key=True)
     comm_log_id = db.Column(db.Integer, db.ForeignKey('comm_log.id'))
     item_line = db.Column(db.Integer)
@@ -187,7 +193,9 @@ class CommLogItem(db.Model):
     method = db.Column(db.String(None))
     note = db.Column(db.String(None)) 
     
-    # Updated FKs to point to user_p
+    # 💡 [추가] 라인별 첨부파일 메타데이터 저장을 위한 컬럼
+    attachment_file_meta = db.Column(db.String(None))
+    
     created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
     created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
     updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
@@ -321,19 +329,10 @@ class TaskList(db.Model):
     project = db.Column(db.String(None))
     remark = db.Column(db.String(None))
     delete_flag = db.Column(db.Integer, nullable=False, default=0)
-    
-    # 💡 [정식 컬럼 추가] 비고란 우회 방식 파기, 독립형 파일 메타 전용 필드 마스터 매핑
-    attachment_1 = db.Column(db.String(None), nullable=True)
-    attachment_2 = db.Column(db.String(None), nullable=True)
-    attachment_3 = db.Column(db.String(None), nullable=True)
-    attachment_4 = db.Column(db.String(None), nullable=True)
-    attachment_5 = db.Column(db.String(None), nullable=True)
-    
     created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
     created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
     updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
     updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
-    
     version_id = db.Column(db.Integer, nullable=False)
 
     @property
@@ -378,11 +377,9 @@ class TaskListItem(db.Model):
     date = db.Column(db.Date, default=func.getdate())
     follow_up = db.Column(db.Date)
     note = db.Column(db.String(None)) 
-    
-    # Updated FKs to point to user_p
+    attachment_file_meta = db.Column(db.String(None))
     created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
     creator = db.relationship('User', foreign_keys=[created_user])
-    
     created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
     updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
     updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
@@ -391,3 +388,98 @@ class TaskListItem(db.Model):
 
 event.listen(TaskListItem, 'before_insert', before_insert_listener)
 event.listen(TaskListItem, 'before_update', before_update_listener)
+
+class ExpenseReport(db.Model):
+    __tablename__ = 'expense_report' 
+    id = db.Column(db.Integer, primary_key=True)   
+    title = db.Column(db.String(None))
+    status = db.Column(db.String(None))
+    owner = db.Column(db.String(None))
+    remark = db.Column(db.String(None))
+    delete_flag = db.Column(db.Integer, nullable=False, default=0)
+    
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    version_id = db.Column(db.Integer, nullable=False)
+    __mapper_args__ = {'version_id_col': version_id}
+    
+    creator = db.relationship('User', foreign_keys=[created_user])
+# 💡 [추가] updated_user의 관계(Relationship) 명시
+    updater = db.relationship('User', foreign_keys=[updated_user])
+
+    items = db.relationship('ExpenseItem', back_populates='expense_report', cascade='all, delete-orphan')
+
+    # --------------------------------------------------------
+    # 💡 [추가된 속성들] 리스트 화면 출력을 위한 변환 함수들
+    # --------------------------------------------------------
+    @property
+    def created_date_cst(self):
+        if self.created_date:
+            cst_offset = timedelta(hours=-5)
+            # 💡 [수정] %H:%M 부분을 제거하여 날짜(YYYY-MM-DD)만 반환하도록 변경
+            return (self.created_date + cst_offset).strftime('%Y-%m-%d')
+        return ""
+
+    @property
+    def updated_date_cst(self):
+        if self.updated_date:
+            cst_offset = timedelta(hours=-5)
+            # 💡 [수정] %H:%M 부분을 제거하여 날짜(YYYY-MM-DD)만 반환하도록 변경
+            return (self.updated_date + cst_offset).strftime('%Y-%m-%d')
+        return ""
+    
+    # @property
+    # def created_date_cst(self):
+    #     if self.created_date:
+    #         cst_offset = timedelta(hours=-5)
+    #         return (self.created_date + cst_offset).strftime('%Y-%m-%d %H:%M')
+    #     return ""
+
+    # @property
+    # def updated_date_cst(self):
+    #     if self.updated_date:
+    #         cst_offset = timedelta(hours=-5)
+    #         return (self.updated_date + cst_offset).strftime('%Y-%m-%d %H:%M')
+    #     return ""
+
+    @property
+    def created_user_name(self):
+        # 작성자의 이메일 앞부분(ID)만 잘라서 출력
+        if self.creator and self.creator.email:
+            return self.creator.email.split('@')[0]
+        return "Unknown"
+
+# 💡 [추가] 리스트 화면에 출력할 Updated User Name 변환 함수
+    @property
+    def updated_user_name(self):
+        if self.updater and self.updater.email:
+            return self.updater.email.split('@')[0]
+        return ""
+
+class ExpenseItem(db.Model):
+    __tablename__ = 'expense_item' 
+    id = db.Column(db.Integer, primary_key=True)
+    expense_report_id = db.Column(db.Integer, db.ForeignKey('expense_report.id'))
+    item_line = db.Column(db.Integer)
+    expense_date = db.Column(db.Date, default=func.getdate())
+    expense_type = db.Column(db.String(None))
+    category = db.Column(db.String(None))
+    sub_category = db.Column(db.String(None)) # 신규 추가
+    amount = db.Column(db.Float)
+    description = db.Column(db.String(None))
+    receipt_file_meta = db.Column(db.String(None))
+    
+    # ... (나머지 컬럼은 기존과 동일)
+    
+    created_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    created_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    updated_user = db.Column(db.Integer, db.ForeignKey('user_p.id'))
+    updated_date = db.Column(db.DateTime(timezone=True), default=func.getdate())
+    
+    expense_report = db.relationship('ExpenseReport', back_populates='items')
+
+event.listen(ExpenseItem, 'before_insert', before_insert_listener)
+event.listen(ExpenseItem, 'before_update', before_update_listener)

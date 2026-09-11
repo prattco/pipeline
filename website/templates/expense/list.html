@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Expense List{% endblock %}
+
+{% block content %}
+
+<br/>
+<h2 align="center">Expense List</h2>
+<br/>
+
+<div style="text-align: center;">
+    <form action="" method="POST" align="center">
+        <input type="button" class="btn btn-primary btn-sm" onclick="location.href='/expense/create'" value="CREATE EXPENSE" />
+        <button formaction="/expense/download" type="submit" class="btn btn-primary btn-sm">DOWNLOAD</button>
+    </form>
+</div>
+
+<br />
+<br/>
+<h6 align="center">Select fields to display.</h6>
+
+<div style="text-align: center; margin-bottom: 20px;">
+    <!-- 💡 [수정] 옵션 순서 및 Index(0~7) 재배치 -->
+    <select id="column-selector" multiple="multiple" style="width: 500px;">
+        <option value="0" selected>Title</option>
+        <option value="1" selected>Status</option>
+        <option value="2" >Owner</option>
+        <option value="3" selected>Remark</option>
+        <option value="4" selected>Created Date</option>
+        <option value="5" selected>Created User</option>
+        <option value="6" selected>Updated Date</option>
+        <option value="7" selected>Updated User</option>
+    </select>
+</div>
+
+<div style="display: flex; justify-content: center;">
+    <table id="list" class="display stripe compact" style="width: 95%;">
+        <thead>
+            <!-- 💡 [수정] 테이블 헤더 순서 재배치 -->
+            <tr>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Owner</th>
+                <th>Remark</th>
+                <th>Created Date</th>
+                <th>Created User</th>
+                <th>Updated Date</th>
+                <th>Updated User</th>
+            </tr>
+            <tr>
+                <th><input type="text" data-column="0" class="filter-input" placeholder="Filter Title"></th>
+                <th><input type="text" data-column="1" class="filter-input" placeholder="Filter Status"></th>
+                <th><input type="text" data-column="2" class="filter-input" placeholder="Filter Owner"></th>
+                <th><input type="text" data-column="3" class="filter-input" placeholder="Filter Remark"></th>
+                <th><input type="text" data-column="4" class="filter-input" placeholder="Filter Created Date"></th>
+                <th><input type="text" data-column="5" class="filter-input" placeholder="Filter Created User"></th>
+                <th><input type="text" data-column="6" class="filter-input" placeholder="Filter Updated Date"></th>
+                <th><input type="text" data-column="7" class="filter-input" placeholder="Filter Updated User"></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <!-- 💡 [수정] 테이블 데이터(Body) 출력 순서 재배치 -->
+            {% for expense in list %}
+            <tr>
+                <td>
+                    <a href="/expense/display/{{ expense.id }}">{{ expense.title.strip() if expense.title else "" }}</a>
+                </td>
+                <td>{{ expense.status.strip() if expense.status else "" }}</td>
+                <td>{{ expense.owner.strip() if expense.owner else "" }}</td>
+                <td>{{ expense.remark.strip() if expense.remark else "" }}</td>
+                <td>{{ expense.created_date_cst }}</td>
+                <td>{{ expense.created_user_name }}</td>
+                <td>{{ expense.updated_date_cst }}</td>
+                <td>{{ expense.updated_user_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var table = $('#list').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            // 💡 [수정] Created Date가 이제 Index 4이므로 정렬 기준을 4로 변경
+            order: [[4, 'desc']], 
+            pageLength: 100,
+            autoWidth: false, 
+            responsive: true
+        });
+
+        $('#column-selector').select2({
+            placeholder: "Select columns",
+            allowClear: true
+        });
+    
+        function updateColumnVisibility() {
+            var selectedColumns = $('#column-selector').val() || [];
+            var selectedColumnIndices = selectedColumns.map(Number);
+    
+            table.columns().every(function(index) {
+                var isVisible = selectedColumnIndices.includes(index);
+                this.visible(isVisible);
+                $('.filter-input[data-column="' + index + '"]').closest('th').toggle(isVisible);
+            });
+        }
+    
+        $('#column-selector').on('change', function() {
+            updateColumnVisibility();
+        });
+    
+        // Status 열은 그대로 Index 1
+        const statusColumnIndex = 1; 
+        const defaultStatusFilterValue = ''; 
+    
+        $(`.filter-input[data-column="${statusColumnIndex}"]`).val(defaultStatusFilterValue);
+        var filterValues = defaultStatusFilterValue.split(',').map(item => item.trim());
+        var regex = filterValues.join('|');
+        table.column(statusColumnIndex).search(regex, true, false).draw();
+    
+        $('.filter-input').on('keyup', function () {
+            var colIdx = $(this).data('column');
+            var filterVal = this.value;
+            
+            var filterValues = filterVal.split(',').map(item => item.trim());
+            var regex = filterValues.join('|');
+            
+            table.column(colIdx).search(regex, true, false).draw();
+        });
+    
+        updateColumnVisibility();
+    });
+</script>
+{% endblock %}

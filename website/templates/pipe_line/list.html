@@ -26,10 +26,10 @@
     <!-- <label for="column-selector">Select Columns to Display:</label> -->
     <select id="column-selector" multiple="multiple" style="width: 400px;">
         <option value="0" selected>Conmpany</option>
-        <option value="1" selected>Customer Type</option>
+        <option value="1" >Customer Type</option>
         <option value="2" >Application</option>
         <option value="3" >Owner</option>
-        <option value="4" selected>Product</option>
+        <option value="4" >Product</option>
         <option value="5" >Product Type</option>
         <option value="6" >Shared</option>
         <option value="7" selected>Status</option>
@@ -38,7 +38,7 @@
 
         <option value="10" selected>Latest Note</option>
         <option value="11" selected>Latest Date</option>
-        <option value="12" selected>Follow Up</option>
+        <option value="12" >Follow Up</option>
         <option value="13" >Comp Model</option>
         <option value="14" selected>Remark</option>
 
@@ -121,8 +121,9 @@
                 </td>
 
                 <td>
-                    {{ pipe_line.latest_note }}
+                    {{ pipe_line.latest_note | safe }}
                 </td>
+
                 <td>
                     {{ pipe_line.latest_date }}
                 </td>
@@ -133,7 +134,7 @@
                     {{ pipe_line.comp_model }}
                 </td>
                 <td>
-                    {{ pipe_line.remark }}
+                    {{ pipe_line.remark | safe }}
                 </td>
 
             </tr>

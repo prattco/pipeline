@@ -199,40 +199,63 @@
     </div>
 
 
-   
     <hr>
 
-    <div class="detail-section" id="detail-section">
+    <!-- 💡 CSS 파일의 강제 설정을 덮어쓰고 완벽한 비율로 맞추는 Grid 스타일 -->
+    <style>
+        #custom-detail-section .detail-header,
+        #custom-detail-section .detail-row {
+            display: grid !important;
+            grid-template-columns: 100px 100px 1fr 180px !important;
+            gap: 15px !important;
+        }
+        #custom-detail-section .detail-header {
+            align-items: center !important;
+            font-weight: bold !important;
+            color: #ffffff !important; /* 💡 어두운 배경에 맞춰 글자를 흰색으로 강제 표시 */
+        }
+        #custom-detail-section .detail-row {
+            align-items: start !important;
+            border-bottom: 1px solid #eee;
+            padding: 10px 0;
+        }
+        #custom-detail-section .detail-column {
+            flex: none !important; 
+            width: 100% !important;
+        }
+    </style>
+
+    <div class="detail-section" id="custom-detail-section">
         <div class="detail-header">
-            <div class="detail-column width1">
-                Date
-            </div>
-
-            <div class="detail-column width3">
-                Note
-            </div>
-
+            <div class="detail-column">DATE</div>
+            <div class="detail-column">FOLLOW UP</div>
+            <div class="detail-column">NOTE</div>
+            <div class="detail-column">ATTACHMENT</div>
         </div>
 
         {% if form.items %}
-            {# UPDATED LINE BELOW #}
             {% for item_form in form.items | sort(attribute='date.data', reverse=True) %}
                 <div class="detail-row">
-                    <div class="detail-column width1">
-                        {{ item_form.date.data }}
+                    <div class="detail-column">{{ item_form.date.data }}</div>
+                    <div class="detail-column">{{ item_form.follow_up.data if item_form.follow_up.data else '' }}</div>
+                    <div class="detail-column" style="white-space: pre-wrap; word-wrap: break-word;">{{ item_form.note.data }}</div>
+                    <div class="detail-column">
+                        <!-- 💡 읽기 전용 모드: Delete 체크박스 없이 파일 뷰어 링크만 제공 -->
+                        {% set meta = item_form.object_data.attachment_file_meta if item_form.object_data else None %}
+                        {% if meta and "||URL_INFO:" in meta %}
+                            {% set parts = meta.split("||URL_INFO:") %}
+                            <a href="{{ parts[1].strip() }}" target="_blank" class="btn btn-outline-success btn-sm" style="font-size: 0.8rem; padding: 2px 8px; border-radius: 4px;">
+                                <i class="fa fa-file-text-o" style="margin-right: 4px;"></i>{{ parts[0].strip() }}
+                            </a>
+                        {% else %}
+                            <span style="color: #999; font-size: 0.85rem;">No File</span>
+                        {% endif %}
                     </div>
-
-                    <div class="detail-column width3">
-                        {{ item_form.note.data }}
-                    </div>
-
                 </div>
             {% endfor %}
         {% else %}
-            <p>No items to display.</p>
+            <div class="detail-row" style="grid-template-columns: 1fr !important;"><div class="detail-column">No items to display.</div></div>
         {% endif %}
-
-
     </div>
 
     <hr>

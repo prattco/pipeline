@@ -1,0 +1,233 @@
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/form_style.css') }}" />
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.google.com/ui/1.12.1/themes/base/jquery-ui.css">
+<script src="{{ url_for('static', filename='js/form_common.js') }}"></script>
+<script type="text/javascript">
+    
+    const categoryMap = {
+        'Travel': ['Air', 'Hotel', 'Meal', 'Transportation', 'Rent', 'Other'],
+        'Meals and Entertainment': ['Meals with client', 'Meals with employees'], 
+        'IT': ['Hardware', 'Software'],
+        'Supplies': ['Office', 'Warehouse'],
+        'Others': ['Others']
+    };
+
+    function updateSubCategoryOptions(categorySelect, initialValue = '') {
+        const category = categorySelect.val();
+        const row = categorySelect.closest('.detail-row');
+        // 💡 콤마(,)를 사용해 기본 name과 하이픈이 포함된 name을 모두 안전하게 찾습니다.
+        const subCategorySelect = row.find('select[name="sub_category"], select[name$="-sub_category"]');
+        
+        subCategorySelect.empty();
+        subCategorySelect.append($('<option></option>').attr('value', '').text('Select...'));
+        
+        if (category && categoryMap[category]) {
+            $.each(categoryMap[category], function(index, value) {
+                const option = $('<option></option>').attr('value', value).text(value);
+                if (value === initialValue) {
+                    option.prop('selected', true);
+                }
+                subCategorySelect.append(option);
+            });
+        }
+    }
+
+    $(document).ready(function() {
+        $('select[name="category"], select[name$="-category"]').each(function() {
+            const row = $(this).closest('.detail-row');
+            const subCategorySelect = row.find('select[name="sub_category"], select[name$="-sub_category"]');
+            const existingValue = subCategorySelect.attr('data-selected-value'); 
+            updateSubCategoryOptions($(this), existingValue);
+        });
+
+        $(document).on('change', 'select[name="category"], select[name$="-category"]', function() {
+            updateSubCategoryOptions($(this));
+        });
+    });
+
+
+    function addLine() {
+        var detail_section = $('div#detail-section');
+        var insertRow = $('#insert_row').clone().removeAttr('id');
+
+        var index = -1;
+        $('div.detail-row', detail_section).each(function(i, div){
+          if ((val = parseInt($(div).attr('index'))) > index) { index = val; }
+        });
+        index++;
+
+        insertRow.attr("index", index);
+
+        // 폼 인덱싱
+        indexingItem("expense_date", insertRow);
+        indexingItem("expense_type", insertRow);
+        indexingItem("category", insertRow);
+        indexingItem("sub_category", insertRow);
+        indexingItem("amount", insertRow);
+        indexingItem("description", insertRow);
+        indexingItem("receipt", insertRow); 
+        
+        detail_section.append(insertRow);
+        refInputSetup(insertRow);        
+    }
+
+    function indexingItem(name, row) {
+        var index = row.attr("index");
+        var item_name_prefix = 'items-' + index;
+        
+        // 💡 [핵심 수정] 하이픈 없는 순수 템플릿(name="amount")과 접두어가 붙은(name$="-amount") 것을 모두 완벽히 잡아냅니다.
+        var target = $('[name="' + name + '"], [name$="-' + name + '"]', row);
+        
+        target.attr("name", item_name_prefix + '-' + name);
+        target.attr("id", item_name_prefix + '-' + name);
+    }
+
+    function deleteRow(obj) {
+        $(obj).closest('div.detail-row').remove();
+    }
+
+    function submitCheck() {
+        var index = 0;
+        $('div#detail-section div.detail-row').each(function(i, div){
+            // 💡 [핵심 수정] 제출 전 모든 필드의 인덱스를 재정렬할 때도 누락 없이 필드를 선택합니다.
+            $('[name="expense_date"], [name$="-expense_date"]', div).attr("name", "items-" + index + "-expense_date");
+            $('[name="expense_type"], [name$="-expense_type"]', div).attr("name", "items-" + index + "-expense_type");
+            $('[name="category"], [name$="-category"]', div).attr("name", "items-" + index + "-category");
+            $('[name="sub_category"], [name$="-sub_category"]', div).attr("name", "items-" + index + "-sub_category");
+            $('[name="amount"], [name$="-amount"]', div).attr("name", "items-" + index + "-amount");
+            $('[name="description"], [name$="-description"]', div).attr("name", "items-" + index + "-description");
+            $('[name="receipt"], [name$="-receipt"]', div).attr("name", "items-" + index + "-receipt");
+            
+            // 💡 삭제 체크박스도 저장 시 순서가 꼬이지 않도록 인덱스 재정렬
+            var del_chk = $('input[type="checkbox"][name$="-delete_receipt"]', div);
+            if (del_chk.length > 0) {
+                del_chk.attr("name", "items-" + index + "-delete_receipt");
+            }
+            
+            index++;
+        });
+    }
+
+</script>
+
+<div class="task-list-container">
+    <form action="/expense/save" method='POST' id="expense_form" enctype="multipart/form-data">
+        <div align="left">
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
+        </div>
+        <br />
+        {{ form.hidden_tag() }}
+
+        <div class="input-container">
+            <div class="columnlabel">{{ form.title.label }}</div>
+            <div class="columninput">{{ form.title() }}</div>
+            <div class="columnlabel">{{ form.status.label }}</div>
+            <div class="columninput">{{ form.status() }}</div>
+        </div>
+
+        <div class="input-container">
+            <div class="columnlabel">{{ form.owner.label }}</div>
+            <div class="columninput">{{ form.owner() }}</div>
+            <div class="columnlabel">{{ form.remark.label }}</div>
+            <div class="columninput">{{ form.remark() }}</div>
+        </div>
+        <hr>
+
+        <div align="center">
+            <input type="button" class="btn btn-primary btn-sm" onclick="addLine()" value="ADD ITEM" />
+        </div>
+        <br>
+
+        <div class="detail-section form-table" id="detail-section">
+            <!-- 💡 [수정] 높이 찌그러짐 방지를 위해 padding과 align-items: center 추가 -->
+            <div class="detail-header" style="display: grid; grid-template-columns: 30px 110px 110px 120px 140px 80px 150px 180px; gap: 5px; padding: 12px 5px; align-items: center;">
+                <div>Act</div><div>Date</div><div>Type</div><div>Category</div><div>Sub Category</div><div>Amount</div><div>Description</div><div>Receipt</div>
+            </div>
+
+            {% for item_form in form.items %}
+            <div class="detail-row" index="{{ loop.index0 }}" style="display: grid; grid-template-columns: 30px 110px 110px 120px 140px 80px 150px 180px; gap: 5px; align-items: start; margin-top:5px;">
+                <div>
+                    {{ item_form.hidden_tag() }}
+                    <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
+                </div>
+                <div>{{ item_form.expense_date(style="width:100%") }}</div>
+                <div>{{ item_form.expense_type(style="width:100%") }}</div>
+                
+                <!-- 💡 [수정] 수동 Select 태그 렌더링 (Category) -->
+                <div>
+                    <select name="items-{{ loop.index0 }}-category" id="items-{{ loop.index0 }}-category" style="width:100%">
+                        <option value="">Select...</option>
+                        <option value="Travel" {% if item_form.category.data == 'Travel' %}selected{% endif %}>Travel</option>
+                        <option value="Meals and Entertainment" {% if item_form.category.data == 'Meals and Entertainment' %}selected{% endif %}>Meals and Entertainment</option>
+                        <option value="IT" {% if item_form.category.data == 'IT' %}selected{% endif %}>IT</option>
+                        <option value="Supplies" {% if item_form.category.data == 'Supplies' %}selected{% endif %}>Supplies</option>
+                        <option value="Others" {% if item_form.category.data == 'Others' %}selected{% endif %}>Others</option>
+                    </select>
+                </div>
+                
+                <!-- 💡 [수정] 수동 Select 태그 렌더링 (Sub Category) -->
+                <div>
+                    <select name="items-{{ loop.index0 }}-sub_category" id="items-{{ loop.index0 }}-sub_category" style="width:100%" data-selected-value="{{ item_form.sub_category.data or '' }}">
+                        <option value="">Select...</option>
+                    </select>
+                </div>
+
+                <div>{{ item_form.amount(style="width:100%") }}</div>
+                <div>{{ item_form['description'](style="width:100%", rows="2") }}</div>
+            <div>
+                    <!-- 💡 [수정] 파일이 있으면 뷰어 링크와 삭제 체크박스를 함께 렌더링 -->
+                    {% if existing_receipts and existing_receipts.get(loop.index0) %}
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 10px;">
+                            <a href="{{ existing_receipts[loop.index0]['url'] }}" target="_blank" style="font-size: 0.75rem; text-decoration: underline;">[View]</a>
+                            <label style="font-size: 0.75rem; color: #dc3545; cursor: pointer; margin: 0;">
+                                <input type="checkbox" name="items-{{ loop.index0 }}-delete_receipt" value="1" style="vertical-align: middle;"> Delete
+                            </label>
+                        </div>
+                    {% endif %}
+                    <input type="file" name="items-{{ loop.index0 }}-receipt" accept="image/*,application/pdf" style="font-size: 0.75rem; width:100%">
+                </div>
+            </div>
+            {% endfor %}
+            
+        </div>
+        <br /><hr>
+        
+        <div align="center">
+            <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
+        </div>
+    </form>
+
+    <!-- Hidden Template -->
+    <div style="display: none;">
+        <div class="detail-row" id="insert_row" index="" style="display: grid; grid-template-columns: 30px 110px 110px 120px 140px 80px 150px 180px; gap: 5px; align-items: start; margin-top:5px;">
+            <div>
+                <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
+            </div>
+            <div>{{ item_form_template.expense_date(style="width:100%") }}</div>
+            <div>{{ item_form_template.expense_type(style="width:100%") }}</div>
+            
+            <!-- Hidden Template용 수동 Select 태그 -->
+            <div>
+                <select name="items-template-category" id="items-template-category" style="width:100%">
+                    <option value="">Select...</option>
+                    <option value="Travel">Travel</option>
+                    <option value="Meals and Entertainment">Meals and Entertainment</option>
+                    <option value="IT">IT</option>
+                    <option value="Supplies">Supplies</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+            <div>
+                <select name="items-template-sub_category" id="items-template-sub_category" style="width:100%" data-selected-value="">
+                    <option value="">Select...</option>
+                </select>
+            </div>
+
+            <div>{{ item_form_template.amount(style="width:100%") }}</div>
+            <div>{{ item_form_template['description'](style="width:100%", rows="2") }}</div>
+            <div>
+                <input type="file" name="items-template-receipt" accept="image/*,application/pdf" style="font-size: 0.75rem; width:100%">
+            </div>
+        </div>
+    </div>
+</div>

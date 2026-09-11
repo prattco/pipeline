@@ -29,6 +29,8 @@ def do_quality_claim_index():
         quality_claims = QualityClaim.query.filter(QualityClaim.delete_flag != 1).order_by(desc(QualityClaim.id)).all()
 
         quality_claim_list = []
+        import html # HTML 이스케이프 처리를 위해 임포트
+
         for claim in quality_claims:
             # Subquery for the latest item date
             subq = db.session.query(func.max(QualityClaimItem.date)).filter_by(quality_id=claim.id).scalar_subquery()
@@ -47,6 +49,37 @@ def do_quality_claim_index():
             l_date = latest_item.date.strftime('%Y-%m-%d') if (latest_item and latest_item.date) else None
             f_up = latest_item.follow_up.strftime('%Y-%m-%d') if (latest_item and latest_item.follow_up) else None
 
+            # --------------------------------------------------------
+            # 💡 [Latest Note 가공] 50자가 넘으면 자르고 모달 팝업 링크 추가
+            # --------------------------------------------------------
+            raw_latest_note = latest_item.note if latest_item else ""
+            if raw_latest_note:
+                safe_note = html.escape(raw_latest_note, quote=True)
+                stripped_note = raw_latest_note.strip()
+                if len(stripped_note) > 50:
+                    truncated_text = html.escape(stripped_note[:50]) + "..."
+                    latest_note_html = f'{truncated_text} <a href="javascript:void(0);" class="view-more-btn" data-note="{safe_note}" style="color: #007bff; font-weight: bold; cursor: pointer;">[More]</a>'
+                else:
+                    latest_note_html = html.escape(stripped_note)
+            else:
+                latest_note_html = ""
+
+            # --------------------------------------------------------
+            # 💡 [Issue 가공] 50자가 넘으면 자르고 모달 팝업 링크 추가
+            # --------------------------------------------------------
+            raw_issue = claim.issue if claim.issue else ""
+            if raw_issue:
+                safe_issue = html.escape(raw_issue, quote=True)
+                stripped_issue = raw_issue.strip()
+                if len(stripped_issue) > 50:
+                    truncated_issue = html.escape(stripped_issue[:50]) + "..."
+                    issue_html = f'{truncated_issue} <a href="javascript:void(0);" class="view-more-btn" data-note="{safe_issue}" style="color: #007bff; font-weight: bold; cursor: pointer;">[More]</a>'
+                else:
+                    issue_html = html.escape(stripped_issue)
+            else:
+                issue_html = ""
+            # --------------------------------------------------------
+
             # Build data dictionary matching model names
             quality_claim_data = {
                 'id': claim.id,
@@ -59,23 +92,19 @@ def do_quality_claim_index():
                 'rma_no': claim.rma_no.strip() if claim.rma_no else "",
                 'failure_loc': claim.failure_loc.strip() if claim.failure_loc else "",
                 'serial_no': claim.serial_no.strip() if claim.serial_no else "",
-                'issue': claim.issue.strip() if claim.issue else "",
-                # FIXED: Corrected attribute name from .action to .corrective_action
+                'issue': issue_html,
                 'corrective_action': claim.corrective_action.strip() if claim.corrective_action else "",
                 'closed_date': claim.closed_date.strftime('%Y-%m-%d') if claim.closed_date else "",
                 'credit_memo': claim.credit_memo.strip() if claim.credit_memo else "",
-                'latest_note': latest_item.note if latest_item else "",
+                'latest_note': latest_note_html, 
                 'latest_date': l_date,
                 'follow_up': f_up,
-                
             }
             quality_claim_list.append(quality_claim_data)
 
-        # Renamed variable from 'list' to 'claims' to avoid keyword conflicts
         return render_template("quality_claim/list.html", user=current_user, claims=quality_claim_list)
 
     except Exception as e:
-        # For local debugging, print the full traceback
         import traceback
         traceback.print_exc()
         print(f"Error in do_quality_claim_index: {e}")

@@ -55,38 +55,54 @@
               <a class="nav-link active" aria-current="page" href="/">Home</a>
             </li>
 
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                Pipe Lines
-              </a>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" href="/pipe_line/list">Entry</a></li>
-                <li><a class="dropdown-item" href="/pipe_line/report">View</a></li>
-                
-              </ul>
-            </li>
+            <!-- [조건 분기] first_name이 'LG'인 경우: Pipeline Report와 Quality Claim만 노출[cite: 15] -->
+            {% if user.first_name == 'LG' %}
+            
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/pipe_line/report">Pipeline Report</a>
+                </li>            
 
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/quality_claim/list">Quality Claims</a>
+                </li>
 
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/quality_claim/list">Quality Claims</a>
-            </li>
+            <!-- [조건 분기] 그 외(ALL 등)의 경우: 모든 메뉴 노출[cite: 15] -->
+            {% else %}
 
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/comm_log/list">Communication Log</a>
-            </li>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/pipe_line/list">Pipeline Entry</a>
+                </li>
 
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/quote_request/list">Quote Request</a>
-            </li>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/pipe_line/report">Pipeline Report</a>
+                </li>            
 
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/task_list/list">Task List</a>
-            </li>
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/quality_claim/list">Quality Claims</a>
+                </li>
 
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/comm_log/list">Communication Log</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/quote_request/list">Quote Request</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/task_list/list">Task List</a>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/expense/list">Expense Report</a>
+                </li>
+
+            {% endif %}
 
             <li class="nav-item">
               <a class="nav-link active" aria-current="page" href="/logout">Logout</a>
             </li>
+            
             {% else %}
             <li class="nav-item">
               <a class="nav-link" href="/login">Login</a>
@@ -123,9 +139,30 @@
         {% endfor %} 
       {% endif %} 
     {% endwith %}
+    
     <div class="container">
       {% block content %} 
       {% endblock %}
+    </div>
+
+    <!-- [추가] 긴 노트 내용을 띄워줄 공통 모달 팝업 구조 -->
+    <div class="modal fade" id="noteModal" tabindex="-1" role="dialog" aria-labelledby="noteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="noteModalLabel">Full Note Details</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('#noteModal').modal('hide');">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <p id="modal-note-content" style="white-space: pre-wrap; word-break: break-word;"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" onclick="$('#noteModal').modal('hide');">Close</button>
+          </div>
+        </div>
+      </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" 
@@ -144,8 +181,16 @@
       crossorigin="anonymous">
     </script>
 
-    {% block javascript %}
+{% block javascript %}
     <script type="text/javascript">
+      // 💡 [수정] More 버튼 클릭 시 data-note에 숨겨둔 텍스트를 꺼내와서 모달에 띄우는 안전한 방식
+      $(document).on('click', '.view-more-btn', function(e) {
+          e.preventDefault();
+          var fullText = $(this).attr('data-note');
+          $('#modal-note-content').text(fullText); // .text()를 사용해 안전하게 렌더링 (XSS 차단 및 줄바꿈 보존)
+          $('#noteModal').modal('show');
+      });
+
       function deleteNote(noteId) {
         fetch("/delete-note", {
           method: "POST", 
@@ -155,7 +200,9 @@
         });
       }
 
-      // 💡 i 아이콘 마우스 오버 시 description 속성을 툴팁박스로 보여주는 스크립트 결합
+      // i 아이콘 마우스 오버 툴팁... (기존 하단 스크립트 내용 유지)
+
+      // i 아이콘 마우스 오버 시 description 속성을 툴팁박스로 보여주는 스크립트 결합[cite: 1]
       $(document).on('mouseenter', '.field-info', function(e) {
           var description = $(this).attr('description');
           if (description) {
@@ -164,13 +211,13 @@
       }).on('mouseleave', '.field-info', function() {
           $('.tooltipbox').hide();
       }).on('mousemove', '.field-info', function(e) {
-          // 마우스 포인터를 실시간으로 따라다니도록 위치와 스타일 강제 지정
+          // 마우스 포인터를 실시간으로 따라다니도록 위치와 스타일 강제 지정[cite: 1]
           $('.tooltipbox').css({
               top: (e.pageY + 15) + 'px',
               left: (e.pageX + 15) + 'px',
               position: 'absolute',
               zIndex: 9999,
-              background: '#2d3748', /* 가독성 좋은 어두운 반투명/다크 톤 */
+              background: '#2d3748', /* 가독성 좋은 어두운 반투명/다크 톤[cite: 1] */
               color: '#ffffff',
               padding: '6px 12px',
               borderRadius: '4px',

@@ -11,6 +11,9 @@ from . import azurecred
 from .lib.Helper import getUrl as helperGetUrl, getModule as helperGetModule, getMethod as helperGetMethod
 
 
+
+
+
 params = urllib.parse.quote_plus(
     f"DRIVER={{{azurecred.AZDBDRIVER}}};"
     f"SERVER={azurecred.AZDBSERVER};"
@@ -43,6 +46,8 @@ def create_app():
     from .modules.comm_log import comm_log
     from .modules.quote_request import quote_request
     from .modules.task_list import task_list
+    # Import the new expense module
+    from .modules.expense import expense_bp
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
@@ -50,7 +55,10 @@ def create_app():
     app.register_blueprint(quality_claim, url_prefix='/')
     app.register_blueprint(comm_log, url_prefix='/')
     app.register_blueprint(quote_request, url_prefix='/')
-    app.register_blueprint(task_list, url_prefix='/')
+    app.register_blueprint(task_list, url_prefix='/') 
+       # Register the blueprint
+    app.register_blueprint(expense_bp, url_prefix='/')
+
 
     from .models import User, Note
     

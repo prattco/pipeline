@@ -1,3 +1,5 @@
+# task_list.py
+
 from flask import Blueprint, render_template, request, redirect, abort, flash
 from flask_login import login_required, current_user
 from sqlalchemy import desc, func
@@ -109,7 +111,6 @@ def do_task_list_display(id):
             flash('You are not authorized', category='error')
             return redirect('/')
 
-        # models.py에 creator 관계를 추가했으므로 에러 없이 정상 작동 및 쿼리 최적화 완료
         task_list_obj = TaskList.query\
             .options(
                 joinedload(TaskList.creator),
@@ -127,16 +128,17 @@ def do_task_list_display(id):
 
         form.items.entries = []
         for item in task_list_obj.items:
-            item_form = TaskListItemForm(obj=item)
+            # 💡 [핵심 수정] 폼 데이터 딕셔너리가 아닌, SQLAlchemy '객체(item)' 자체를 그대로 넣어야 
+            # object_data가 보존되어 템플릿에서 attachment_file_meta 값을 읽어올 수 있습니다.
+            form.items.append_entry(item)
             
-            # 정석적인 객체 지향형 데이터 매핑
+            # 💡 작성자 이름(이메일 앞부분)만 방금 추가된 라인에 덮어쓰기
             if item.creator and item.creator.email:
                 item_user_prefix = item.creator.email.split('@')[0]
             else:
                 item_user_prefix = ""
                 
-            item_form.created_user.data = item_user_prefix
-            form.items.append_entry(item_form)
+            form.items[-1].created_user.data = item_user_prefix
 
         return render_template("task_list/display.html", user=current_user, form=form)
     except Exception as e:
@@ -169,47 +171,22 @@ def do_task_list_create():
 @login_required
 def do_task_list_modify(id):
     try:
-        task_list = getTaskList(id)
+        task_list_obj = getTaskList(id)
         form = prepareForm(TaskListForm)
         
-        form.id.data = task_list.id
-        form.status.data = task_list.status
-        form.owner.data = task_list.owner
-        form.customer.data = task_list.customer
-        form.customer_prospect.data = task_list.customer_prospect
-        form.project.data = task_list.project
-        form.remark.data = task_list.remark
-
-        # 📁 [안정화] DB 컬럼에서 바로 첨부파일 데이터를 안전하게 읽어와 템플릿용 딕셔너리 구축
-        existing_files = []
-        for i in range(1, 6):
-            field_name = f'attachment_{i}'
-            db_file_data = getattr(task_list, field_name, None)
-            
-            # WTForms 내부 백킹 오브젝트 싱크를 위한 강제 주입
-            if hasattr(form, field_name):
-                getattr(form, field_name).data = db_file_data
-            
-            if db_file_data and "||URL_INFO_" in db_file_data:
-                try:
-                    url_marker = f"||URL_INFO_{i}:"
-                    parts = db_file_data.split(url_marker)
-                    filename = parts[0].strip()
-                    url = parts[1].strip() if len(parts) > 1 else "#"
-                    
-                    if filename:
-                        existing_files.append({
-                            'index': i,
-                            'filename': filename,
-                            'url': url
-                        })
-                except Exception as parse_err:
-                    print(f"Error reading attachment field {i}: {parse_err}")
+        form.id.data = task_list_obj.id
+        form.status.data = task_list_obj.status
+        form.owner.data = task_list_obj.owner
+        form.customer.data = task_list_obj.customer
+        form.customer_prospect.data = task_list_obj.customer_prospect
+        form.project.data = task_list_obj.project
+        form.remark.data = task_list_obj.remark
 
         form.items.entries = []
-        for item in task_list.items:
-            item_form = TaskListItemForm(obj=item)
-            form.items.append_entry(item_form.data)
+        for item in task_list_obj.items:
+            # 💡 [핵심 버그 수정] item_form.data 가 아닌 SQLAlchemy '객체(item)' 자체를 그대로 넣어야 
+            # object_data가 보존되어 템플릿에서 첨부파일(attachment_file_meta) 값을 읽어올 수 있습니다.
+            form.items.append_entry(item)
 
         item_form_template = prepareForm(TaskListItemForm)
 
@@ -217,8 +194,7 @@ def do_task_list_modify(id):
             'task_list/modify.html', 
             user=current_user,
             form=form, 
-            item_form_template=item_form_template,
-            existing_files=existing_files
+            item_form_template=item_form_template
         )
     except Exception as e:
         print(f"Error in do_task_list_modify: {e}")
@@ -280,9 +256,6 @@ def sendNotification(obj, is_new=True):
         print(f"Failed to send email: {e}")
 
 def saveAction(form):
-    """
-    Helper function to perform the actual save action with support for up to 5 attachments via dedicated DB fields.
-    """
     try:
         if hasattr(form.id, 'data'): task_id = form.id.data
         else: task_id = form.id
@@ -293,11 +266,16 @@ def saveAction(form):
         original_created_date = task_list_obj.created_date
         existing_item_ids = [item.id for item in task_list_obj.items]
         submitted_item_ids = set()
+        
+        # 💡 아이템별 기존 첨부파일 유지 딕셔너리
+        old_attachments = {item.id: item.attachment_file_meta for item in task_list_obj.items}
 
         for index, item_form_field in enumerate(form.items, start=1):
             sub_form = item_form_field.form
             item_id_val = sub_form.id.data
-            item_data = {k: v for k, v in sub_form.data.items() if k != 'id'}
+            
+            # ForeignKey 에러 방지 위해 created_user는 폼 전송 데이터에서 제외
+            item_data = {k: v for k, v in sub_form.data.items() if k not in ('id', 'created_user')}
             
             if item_id_val and str(item_id_val).strip() and str(item_id_val) != '0':
                 item = TaskListItem.query.get(item_id_val)
@@ -309,24 +287,36 @@ def saveAction(form):
                 item = TaskListItem()
                 for key, value in item_data.items(): setattr(item, key, value)
                 item.item_line = index
+                if is_new: item.created_user = current_user.id
                 task_list_obj.items.append(item)
+
+            # 💡 [핵심] 아이템 단위 파일 업로드 및 삭제(Delete) 처리
+            file_index = index - 1
+            file_input_name = f'items-{file_index}-attachment'
+            delete_checkbox_name = f'items-{file_index}-delete_attachment'
+            
+            file = request.files.get(file_input_name)
+            delete_flag = request.form.get(delete_checkbox_name)
+
+            if file and file.filename != '':
+                unique_filename = f"task_{task_list_obj.id}_L{file_index}_{file.filename}"
+                try:
+                    sharepoint_url = upload_file_to_sharepoint(file, unique_filename)
+                    item.attachment_file_meta = f"{file.filename}||URL_INFO:{sharepoint_url}"
+                except Exception as file_err:
+                    print(f"Attachment Upload Error (Line {file_index}): {file_err}")
+            else:
+                # 파일 첨부가 새로 안 된 상태에서 '삭제' 체크박스가 눌렸다면 DB에서 파일 정보 제거
+                if delete_flag:
+                    item.attachment_file_meta = None
+                elif item.id in old_attachments:
+                    item.attachment_file_meta = old_attachments[item.id]
 
         for remove_id in [rid for rid in existing_item_ids if rid not in submitted_item_ids]:
             removeItem = TaskListItem.query.get(remove_id)
             if removeItem: db.session.delete(removeItem)
 
-        # 1. 폼 기본 일반 데이터 객체 주입
-        excluded_keys = [
-            'id', 
-            'items',
-            'csrf_token',
-            'attachment_1',
-            'attachment_2',
-            'attachment_3',
-            'attachment_4',
-            'attachment_5',
-            'created_user'
-             ]
+        excluded_keys = ['id', 'items', 'csrf_token', 'created_user']
 
         for fieldname, field in form._fields.items():
             if fieldname not in excluded_keys:
@@ -336,38 +326,7 @@ def saveAction(form):
         task_list_obj.updated_user = current_user.id
         task_list_obj.created_date = original_created_date
         
-        # 파일 수정을 진행하기 전 세션에 있는 객체의 원래 스냅샷 데이터를 백업해둡니다.
-        # 이렇게 해야 세션 변경 과정에서 컬럼 데이터가 FileStorage로 꼬이는 것을 원천 차단합니다.
-        old_attachments = {}
-        if not is_new:
-            for idx in range(1, 6):
-                old_attachments[idx] = getattr(task_list_obj, f'attachment_{idx}', None)
-
         db.session.add(task_list_obj)
-        db.session.flush()
-
-        # 2. 📁 전용 독립 컬럼 5개 루프 돌며 파일 매핑 및 보존 제어 (타입 에러 방어 보호막 완비)
-        for i in range(1, 6):
-            input_name = f'attachment_{i}'
-            file = request.files.get(input_name) if input_name in request.files else None
-            
-            # Case A: 사용자가 새 파일을 업로드 한 경우 -> SharePoint 전송 후 해당 컬럼 문자열 새 데이터로 교체
-            if file and file.filename != '':
-                unique_filename = f"task_{task_list_obj.id}_f{i}_{file.filename}"
-                try:
-                    sharepoint_url = upload_file_to_sharepoint(file, unique_filename)
-                    meta_value = f"{file.filename}||URL_INFO_{i}:{sharepoint_url}"
-                    setattr(task_list_obj, f'attachment_{i}', meta_value)
-                except Exception as file_err:
-                    print(f"SharePoint Multi-Upload Error (File {i}): {file_err}")
-            
-            # Case B: 새 파일을 올리지 않은 경우 -> 객체 오염을 막고 원래 DB에 기록되어 있던 백업 문자열로 강제 환원 및 유지
-            else:
-                if not is_new:
-                    setattr(task_list_obj, f'attachment_{i}', old_attachments.get(i))
-                else:
-                    setattr(task_list_obj, f'attachment_{i}', None)
-
         db.session.commit()
         sendNotification(task_list_obj, is_new)
         return str(task_list_obj.id)

@@ -3,24 +3,23 @@
 <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <script src="{{ url_for('static', filename='js/form_common.js') }}"></script>
 <script type="text/javascript">
-    
     function addLine() {
         var detail_section = $('div#detail-section');
         var insertRow = $('#insert_row').clone().removeAttr('id');
 
         var index = -1;
         $('div.detail-row', detail_section).each(function(i, div){
-          if ((val = parseInt($(div).attr('index'))) > index) {
-            index = val;
-          }
+          if ((val = parseInt($(div).attr('index'))) > index) { index = val; }
         });
         index++;
 
         insertRow.attr("index", index);
 
         indexingItem("date", insertRow);
-        indexingItem("note", insertRow);
         indexingItem("follow_up", insertRow);
+        indexingItem("note", insertRow);
+        indexingItem("attachment", insertRow); // 💡 파일 필드 인덱싱 추가
+
         detail_section.append(insertRow);
         refInputSetup(insertRow);        
     }
@@ -28,15 +27,34 @@
     function indexingItem(name, row) {
         var index = row.attr("index");
         var item_name_prefix = 'items-' + index;
-        var item = $('#' + name, row);
-        item.attr('id', item_name_prefix + "-" + item.attr('name'));
-        item.attr('name', item_name_prefix + "-" + item.attr('name'));
+        var target = $('[name="' + name + '"], [name$="-' + name + '"]', row);
+        target.attr("name", item_name_prefix + "-" + name);
+        target.attr("id", item_name_prefix + "-" + name);
     }
 
     function deleteRow(obj) {
-        var row = $(obj).parent().parent();
+        var row = $(obj).closest('div.detail-row');
         row.remove();
     }
+
+    function submitCheck() {
+        var index = 0;
+        $('div#detail-section div.detail-row').each(function(i, div){
+            $('[name="date"], [name$="-date"]', div).attr("name", "items-" + index + "-date");
+            $('[name="follow_up"], [name$="-follow_up"]', div).attr("name", "items-" + index + "-follow_up");
+            $('[name="note"], [name$="-note"]', div).attr("name", "items-" + index + "-note");
+            $('[name="attachment"], [name$="-attachment"]', div).attr("name", "items-" + index + "-attachment");
+            
+            // 💡 삭제 체크박스도 저장 시 순서가 꼬이지 않도록 인덱스 재정렬
+            var del_chk = $('input[type="checkbox"][name$="-delete_attachment"]', div);
+            if (del_chk.length > 0) {
+                del_chk.attr("name", "items-" + index + "-delete_attachment");
+            }
+            
+            index++;
+        });
+    }
+
 </script>
 
 {% include("/common/common_include.html") %}
@@ -44,7 +62,9 @@
 <br />
 
 <div align="center" class="form-group pipe-line-container mx-sm-3 mb-2">
-    <form action="/pipe_line/save" method='POST' id="pipe_line_form">
+    <!-- 💡 enctype="multipart/form-data" 추가 -->
+    <form action="/pipe_line/save" method='POST' id="pipe_line_form" enctype="multipart/form-data">
+
         <div align="left">
             <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
         </div>
@@ -242,63 +262,58 @@
         </div>
         <br />
         
-        <div class="detail-section" id="detail-section">
-            <div class="detail-header">
+        <div class="detail-section" id="detail-section" style="display: grid; grid-template-columns: 30px 110px 110px 1fr 180px; gap: 5px;">
+            <div class="detail-header" style="grid-column: 1 / -1; display: grid; grid-template-columns: subgrid;">
                 <div class="detail-column"></div>
-                <div class="detail-column">
-                    {{ item_form_template.date.label }}
-                    <i class="fa fa-info-circle field-info" description="Date of communication."></i>
-                </div>
-                <div class="detail-column">
-                    {{ item_form_template.follow_up.label }}
-                    <i class="fa fa-info-circle field-info" description="Date to follow up."></i>
-                </div>
-                <div class="detail-column">
-                    {{ item_form_template.note.label }}
-                    <i class="fa fa-info-circle field-info" description="Communications."></i>
-                </div>
+                <div class="detail-column">Date</div>
+                <div class="detail-column">Follow Up</div>
+                <div class="detail-column">Note</div>
+                <div class="detail-column">Attachment</div>
             </div>
             {% for item_form in form.items %}
-            <div class="detail-row" index="{{loop.index0}}">
+            <div class="detail-row" index="{{loop.index0}}" style="grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: start; margin-top: 5px;">
                 <div class="detail-column">
                     {{ item_form.hidden_tag() }}
                     <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
                 </div>
+                <div class="detail-column">{{ item_form.date(style="width:100%") }}</div>
+                <div class="detail-column">{{ item_form.follow_up(style="width:100%") }}</div>
+                <div class="detail-column">{{ item_form.note(style="width:100%", rows="2") }}</div>
                 <div class="detail-column">
-                    {{ item_form.date() }}
-                </div>
-                <div class="detail-column">
-                    {{ item_form.follow_up() }}
-                </div>
-                <div class="detail-column">
-                    {{ item_form.note() }}
+                    <!-- 💡 [수정] 파일이 있으면 뷰어 링크와 삭제 체크박스를 함께 렌더링 -->
+                    {% set meta = item_form.object_data.attachment_file_meta if item_form.object_data else None %}
+                    {% if meta and "||URL_INFO:" in meta %}
+                        {% set parts = meta.split("||URL_INFO:") %}
+                        <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 10px;">
+                            <a href="{{ parts[1].strip() }}" target="_blank" style="font-size: 0.75rem; text-decoration: underline;">[View]</a>
+                            <label style="font-size: 0.75rem; color: #dc3545; cursor: pointer; margin: 0;">
+                                <input type="checkbox" name="items-{{ loop.index0 }}-delete_attachment" value="1" style="vertical-align: middle;"> Delete
+                            </label>
+                        </div>
+                    {% endif %}
+                    <input type="file" name="items-{{ loop.index0 }}-attachment" accept="image/*,application/pdf" style="font-size: 0.75rem; width:100%">
                 </div>
             </div>
             {% endfor %}
         </div>
         <hr>
-
         <br />
         <div align="center">
             <input type="submit" onclick="submitCheck()" class="btn btn-primary btn-sm" value="SAVE">
         </div>
-
         <br /><br /><br /><br />
     </form>
 
     <div style="display: none;">
-        <div class="detail-row" id="insert_row" index="">
+        <div class="detail-row" id="insert_row" index="" style="display: grid; grid-template-columns: 30px 110px 110px 1fr 180px; gap: 5px; align-items: start; margin-top: 5px;">
             <div class="detail-column">
                 <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
             </div>
+            <div class="detail-column">{{ item_form_template.date(style="width:100%") }}</div>
+            <div class="detail-column">{{ item_form_template.follow_up(style="width:100%") }}</div>
+            <div class="detail-column">{{ item_form_template.note(style="width:100%", rows="2") }}</div>
             <div class="detail-column">
-                {{ item_form_template.date() }}
-            </div>
-            <div class="detail-column">
-                {{ item_form_template.follow_up() }}
-            </div>
-            <div class="detail-column">
-                {{ item_form_template.note() }}
+                <input type="file" name="attachment" accept="image/*,application/pdf" style="font-size: 0.75rem; width:100%">
             </div>
         </div>
     </div>

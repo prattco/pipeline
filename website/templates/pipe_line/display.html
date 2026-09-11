@@ -206,18 +206,34 @@
     <hr>
 
     <div class="detail-section" id="detail-section">
-        <div class="detail-header">
-            <div class="detail-column"></div> <div class="detail-column">Date</div>
+        <div class="detail-header" style="display: flex;">
+            <div class="detail-column"></div> <!-- 💡 CSS 칸 순서 맞추기용 빈칸 추가 -->
+            <div class="detail-column">Date</div>
             <div class="detail-column">Follow Up</div>
             <div class="detail-column">Note</div>
+            <div class="detail-column">Attachment</div>
         </div>
 
         {% if form.items %}
             {% for item_form in form.items | sort(attribute='date.data', reverse=True) %}
-                <div class="detail-row">
-                    <div class="detail-column"></div> <div class="detail-column">{{ item_form.date.data }}</div>
+                <div class="detail-row" style="display: flex; align-items: center; border-bottom: 1px solid #eee; padding: 8px 0;">
+                    <div class="detail-column"></div> <!-- 💡 CSS 칸 순서 맞추기용 빈칸 추가 -->
+                    <div class="detail-column">{{ item_form.date.data }}</div>
                     <div class="detail-column">{{ item_form.follow_up.data }}</div>
-                    <div class="detail-column">{{ item_form.note.data }}</div>
+                    <!-- 줄바꿈(Enter)이 그대로 보이도록 white-space: pre-wrap 추가 -->
+                    <div class="detail-column" style="padding-right: 15px; white-space: pre-wrap;">{{ item_form.note.data }}</div>
+                    <div class="detail-column">
+                        <!-- Expense Report 스타일 첨부파일 버튼 -->
+                        {% set meta = item_form.object_data.attachment_file_meta if item_form.object_data else None %}
+                        {% if meta and "||URL_INFO:" in meta %}
+                            {% set parts = meta.split("||URL_INFO:") %}
+                            <a href="{{ parts[1].strip() }}" target="_blank" class="btn btn-outline-success btn-sm" style="font-size: 0.8rem; padding: 2px 8px; border-radius: 4px;">
+                                <i class="fa fa-file-text-o" style="margin-right: 4px;"></i>{{ parts[0].strip() }}
+                            </a>
+                        {% else %}
+                            <span style="color: #999; font-size: 0.85rem;">No File</span>
+                        {% endif %}
+                    </div>
                 </div>
             {% endfor %}
         {% else %}

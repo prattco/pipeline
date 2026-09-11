@@ -1,0 +1,132 @@
+{% extends "base.html" %} 
+{% block title %}Expense Report{% endblock %} 
+
+{% block ext_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/task_list.css') }}" />
+{% endblock %}
+
+{% block content %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/form_style.css') }}" />
+<script type="text/javascript">
+    function deleteData() {
+        if(confirm("Are you sure to delete?")) {
+            var $form = $('<form/>', {
+                    action: '/expense/delete',
+                    method: 'POST'
+                });
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'delete_id',
+                value: '{{ form.id.data }}'
+            }).appendTo($form);
+
+            $form.appendTo('body').submit();
+        }
+    }
+    function createWithReference() {
+        location.href = '/expense/create?refer={{ form.id.data }}';
+    }
+</script>
+
+<br/> 
+<h2 align="center">Expense Report Display</h2>
+<br />
+
+<!-- 상단 버튼 그룹 영역을 아래와 같이 수정하세요 -->
+<div class="form-group expense-list-container mx-sm-3 mb-2">
+    <div align="left">
+        <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/expense/modify/{{ form.id.data }}'">
+        <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
+        <input type="button" class="btn btn-primary btn-sm" value="DELETE" onclick="deleteData()">
+        <!-- 다운로드 버튼 클래스를 btn-success에서 btn-primary로 변경 -->
+        <input type="button" class="btn btn-primary btn-sm" value="DOWNLOAD" onclick="location.href='/expense/download/{{ form.id.data }}'">
+    </div>
+</div>
+
+<br />
+
+<div class="form-group expense-list-container mx-sm-3 mb-2">
+
+    <!-- Header Fields -->
+    <div class="input-container">
+        <div class="columnlabel">
+            {{ form.title.label }}
+        </div>
+        <div class="columninput uneditable" style="font-weight: bold;">
+            {{ form.title.data }}
+        </div>
+        
+        <div class="columnlabel">
+            {{ form.status.label }}
+        </div>
+        <div class="columninput uneditable">
+            {{ form.status.data }}
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div class="columnlabel">
+            {{ form.owner.label }}
+        </div>
+        <div class="columninput uneditable">
+            {{ form.owner.data }}
+        </div>
+        
+        <div class="columnlabel">
+            {{ form.remark.label }}
+        </div>
+        <div class="columninput uneditable">
+            {{ form.remark.data }}
+        </div>
+    </div>
+   
+    <hr>
+
+<!-- Line Items Section -->
+    <!-- Grid Header 교체부 -->
+    <!-- 💡 [수정] 배경색을 어둡게(#4a5568) 하고, 묻힌 글자가 잘 보이도록 흰색(#ffffff !important)으로 지정 -->
+    <div class="detail-header" style="display: grid; grid-template-columns: 110px 120px 120px 130px 90px 1fr 180px; gap: 10px; font-weight: bold; background-color: #4a5568; color: #ffffff !important; padding: 12px 10px; align-items: center; border-radius: 4px 4px 0 0;">
+        <div>Date</div>
+        <div>Type</div>
+        <div>Category</div>
+        <div>Sub Category</div>
+        <div>Amount</div>
+        <div>Description</div>
+        <div>Receipt</div>
+    </div>
+
+        <!-- Grid Items -->
+        <!-- Grid Items -->
+        {% if form.items %}
+            {% for item_form in form.items %}
+                <div class="detail-row" style="display: grid; grid-template-columns: 110px 120px 120px 130px 90px 1fr 180px; gap: 10px; padding: 10px; border-bottom: 1px solid #e2e8f0; align-items: start;">
+                    <div>{{ item_form.expense_date.data.strftime('%Y-%m-%d') if item_form.expense_date.data else "" }}</div>
+                    <div>{{ item_form.expense_type.data if item_form.expense_type.data else "" }}</div>
+                    <div>{{ item_form.category.data if item_form.category.data else "" }}</div>
+                    <div>{{ item_form.sub_category.data if item_form.sub_category.data else "" }}</div>
+                    <div style="font-weight: 600;">{{ "$ {:.2f}".format(item_form.amount.data) if item_form.amount.data else "" }}</div>
+                    <div style="white-space: pre-wrap; word-break: break-all;">{{ item_form['description'].data if item_form['description'].data else "" }}</div>
+                    <div>
+                        {% if existing_receipts and existing_receipts.get(loop.index0) %}
+                            <a href="{{ existing_receipts[loop.index0]['url'] }}" target="_blank" title="View Receipt on SharePoint" style="display: inline-flex; align-items: center; gap: 6px; color: #1e40af; text-decoration: none; font-weight: 600; font-size: 0.82rem; background-color: #f0fdf4; padding: 5px 10px; border-radius: 4px; border: 1px solid #bbf7d0; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                                <i class="fa fa-file-text-o" style="color: #16a34a; font-size: 0.9rem;"></i>
+                                <span style="border-bottom: 1px dashed #16a34a; padding-bottom: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">
+                                    {{ existing_receipts[loop.index0]['filename'] }}
+                                </span>
+                            </a>
+                        {% else %}
+                            <span style="color: #94a3b8; font-size: 0.85rem; font-style: italic;">No Receipt</span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="detail-row" style="justify-content: center; padding: 30px; color: #94a3b8; font-style: italic;">
+                No items available.
+            </div>
+        {% endif %}
+    </div>
+
+    <hr>
+</div>
+{% endblock %}

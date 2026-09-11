@@ -62,21 +62,91 @@
     </div>
 
     <hr>
-    <h5 style="color: #4a5568; margin-left: 10px;">Primary Contact Details</h5>
+    <h5 style="color: #4a5568; margin-left: 10px;">Contact Details</h5>
     
+    <!-- Contact 1 -->
+    {% if form.contact1.data %}
     <div class="input-container">
         <div class="columnlabel">{{ form.contact1.label }}</div>
         <div class="columninput">{{ form.contact1.data }}</div>
         <div class="columnlabel">{{ form.title1.label }}</div>
         <div class="columninput">{{ form.title1.data }}</div>
     </div>
-
     <div class="input-container">
         <div class="columnlabel">Contact Info</div>
         <div class="columninput">Email: {{ form.email1.data }} | Phone: {{ form.phone1.data }}</div>
         <div class="columnlabel">{{ form.cnote1.label }}</div>
         <div class="columninput">{{ form.cnote1.data }}</div>
     </div>
+    {% endif %}
+
+    <!-- Contact 2 -->
+    {% if form.contact2.data %}
+    <br/>
+    <div class="input-container">
+        <div class="columnlabel">{{ form.contact2.label }}</div>
+        <div class="columninput">{{ form.contact2.data }}</div>
+        <div class="columnlabel">{{ form.title2.label }}</div>
+        <div class="columninput">{{ form.title2.data }}</div>
+    </div>
+    <div class="input-container">
+        <div class="columnlabel">Contact Info</div>
+        <div class="columninput">Email: {{ form.email2.data }} | Phone: {{ form.phone2.data }}</div>
+        <div class="columnlabel">{{ form.cnote2.label }}</div>
+        <div class="columninput">{{ form.cnote2.data }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Contact 3 -->
+    {% if form.contact3.data %}
+    <br/>
+    <div class="input-container">
+        <div class="columnlabel">{{ form.contact3.label }}</div>
+        <div class="columninput">{{ form.contact3.data }}</div>
+        <div class="columnlabel">{{ form.title3.label }}</div>
+        <div class="columninput">{{ form.title3.data }}</div>
+    </div>
+    <div class="input-container">
+        <div class="columnlabel">Contact Info</div>
+        <div class="columninput">Email: {{ form.email3.data }} | Phone: {{ form.phone3.data }}</div>
+        <div class="columnlabel">{{ form.cnote3.label }}</div>
+        <div class="columninput">{{ form.cnote3.data }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Contact 4 -->
+    {% if form.contact4.data %}
+    <br/>
+    <div class="input-container">
+        <div class="columnlabel">{{ form.contact4.label }}</div>
+        <div class="columninput">{{ form.contact4.data }}</div>
+        <div class="columnlabel">{{ form.title4.label }}</div>
+        <div class="columninput">{{ form.title4.data }}</div>
+    </div>
+    <div class="input-container">
+        <div class="columnlabel">Contact Info</div>
+        <div class="columninput">Email: {{ form.email4.data }} | Phone: {{ form.phone4.data }}</div>
+        <div class="columnlabel">{{ form.cnote4.label }}</div>
+        <div class="columninput">{{ form.cnote4.data }}</div>
+    </div>
+    {% endif %}
+
+    <!-- Contact 5 -->
+    {% if form.contact5.data %}
+    <br/>
+    <div class="input-container">
+        <div class="columnlabel">{{ form.contact5.label }}</div>
+        <div class="columninput">{{ form.contact5.data }}</div>
+        <div class="columnlabel">{{ form.title5.label }}</div>
+        <div class="columninput">{{ form.title5.data }}</div>
+    </div>
+    <div class="input-container">
+        <div class="columnlabel">Contact Info</div>
+        <div class="columninput">Email: {{ form.email5.data }} | Phone: {{ form.phone5.data }}</div>
+        <div class="columnlabel">{{ form.cnote5.label }}</div>
+        <div class="columninput">{{ form.cnote5.data }}</div>
+    </div>
+    {% endif %}
 
     <br/>
     <div class="detail-section">
@@ -85,14 +155,26 @@
             <div class="detail-column">Contact</div>
             <div class="detail-column">Method</div>
             <div class="detail-column" style="flex: 3;">Note</div>
+            <div class="detail-column">Attachment</div>
         </div>
-        {% if form.items %}
-            {% for item_form in form.items | sort(attribute='date.data', reverse=True) %}
+        {% if comm_log.items %}
+            {% for item in comm_log.items | sort(attribute='date', reverse=True) %}
             <div class="detail-row">
-                <div class="detail-column" style="flex: 0 0 120px;">{{ item_form.date.data }}</div>
-                <div class="detail-column">{{ item_form.contact.data }}</div>
-                <div class="detail-column">{{ item_form.method.data }}</div>
-                <div class="detail-column" style="flex: 3;">{{ item_form.note.data }}</div>
+                <div class="detail-column" style="flex: 0 0 120px;">{{ item.date.strftime('%Y-%m-%d') if item.date else '' }}</div>
+                <div class="detail-column">{{ item.contact }}</div>
+                <div class="detail-column">{{ item.method }}</div>
+                <div class="detail-column" style="flex: 3;">{{ item.note }}</div>
+                <div class="detail-column">
+                    <!-- 💡 [수정] 첨부파일을 Expense Report 스타일(버튼 형태 및 파일명 표시)로 변경 -->
+                    {% if item.attachment_file_meta and "||URL_INFO:" in item.attachment_file_meta %}
+                        {% set parts = item.attachment_file_meta.split("||URL_INFO:") %}
+                        <a href="{{ parts[1].strip() }}" target="_blank" class="btn btn-outline-success btn-sm" style="font-size: 0.8rem; padding: 2px 8px; border-radius: 4px;">
+                            <i class="fa fa-file-text-o" style="margin-right: 4px;"></i>{{ parts[0].strip() }}
+                        </a>
+                    {% else %}
+                        <span style="color: #999; font-size: 0.85rem;">No File</span>
+                    {% endif %}
+                </div>
             </div>
             {% endfor %}
         {% else %}
