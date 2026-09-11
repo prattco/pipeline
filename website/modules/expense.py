@@ -14,6 +14,8 @@ from ..lib.Extensions import prepareForm, errorForm, redirect_back
 import io
 import zipfile
 import pandas as pd
+from email.mime.text import MIMEText
+import smtplib
 
 
 expense_bp = Blueprint('expense', __name__)
@@ -294,13 +296,88 @@ def do_expense_save():
         errorForm(form)
         return redirect_back()
 
+# 💡 [신규 추가] Expense Report 상태 변경 이메일 발송 함수
+def sendExpenseNotification(obj, old_status, new_status):
+    # 1. 상태가 변경되지 않았거나, 대상 상태가 아니면 이메일을 보내지 않음
+    if old_status == new_status:
+        return
+    if new_status not in ['Submitted', 'Approved']:
+        return
+
+    EMAIL_FROM = "no-reply@chicagolandcfs.com"
+    RECIPIENTS = set()
+    
+    creator = None
+    if obj.created_user:
+        try:
+            creator = User.query.get(int(obj.created_user))
+        except:
+            pass
+
+    if new_status == 'Submitted':
+        # 2-1. Employee -> Supervisor / Admin (제출 알림)
+        if creator and getattr(creator, 'supervisor', None):
+            try:
+                sup = User.query.get(int(creator.supervisor))
+                if sup and sup.email:
+                    RECIPIENTS.add(sup.email.strip())
+            except:
+                pass
+        
+        all_users = User.query.all()
+        for u in all_users:
+            if u.role and u.role.strip().lower() == 'admin' and u.email:
+                RECIPIENTS.add(u.email.strip())
+                
+    elif new_status == 'Approved':
+        # 2-2. Supervisor / Admin -> Employee (결재 완료 알림)
+        if creator and creator.email:
+            RECIPIENTS.add(creator.email.strip())
+
+    if not RECIPIENTS:
+        return
+
+    RECIPIENTS_LIST = list(RECIPIENTS)
+
+    SMTP_SERVER = "smtp.office365.com"
+    SMTP_PORT = 587
+    SMTP_USERNAME = 'no-reply@chicagolandcfs.com'
+    SMTP_PASSWORD = 'NReply@1418'
+
+    user_display_name = current_user.email.split('@')[0] if hasattr(current_user, 'email') and current_user.email else "Someone"
+    
+    action_verb = "submitted" if new_status == 'Submitted' else "approved"
+
+    summary_text = f"'{user_display_name}' {action_verb} the expense report: <b>{obj.title}</b>."
+    BASE_URL = "https://pipe-line.prattco.com"  
+    link = f"{BASE_URL}/expense/display/{obj.id}"
+
+    body = f"<p>{summary_text}</p><p>Please check <a href='{link}'>the system</a> for details.</p>"
+    
+    msg = MIMEText(body, "html")
+    msg['Subject'] = f"Expense Report {new_status}: {obj.title}"
+    msg['From'] = EMAIL_FROM
+    msg['To'] = ", ".join(RECIPIENTS_LIST)
+
+    try:
+        smtp_obj = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        smtp_obj.starttls()
+        smtp_obj.login(SMTP_USERNAME, SMTP_PASSWORD)
+        smtp_obj.sendmail(EMAIL_FROM, RECIPIENTS_LIST, msg.as_string())
+        smtp_obj.quit()
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
 def saveAction(form):
     expense_id = form.id.data if hasattr(form.id, 'data') else form.id
     report_obj = getExpenseReport(expense_id, True)
     is_new = report_obj.id is None
 
+    # 이메일 발송 조건을 확인하기 위해 이전 상태 보존
+    old_status = report_obj.status
+
     if not is_new:
-        user_role = current_user.role.strip().lower() if current_user.role else ""
+        user_role = current_user.role.strip().lower() if getattr(current_user, 'role', None) else ""
         is_admin = (user_role == 'admin')
         
         is_authorized_supervisor = False
@@ -322,8 +399,15 @@ def saveAction(form):
 
     report_obj.title = form.title.data
     report_obj.status = form.status.data
+    new_status = form.status.data
+    
     report_obj.owner = form.owner.data
     report_obj.remark = form.remark.data
+
+    # 💡 [핵심 버그 수정] 작성자 누락 방지: 생성자(created_user) 및 수정자(updated_user)를 명시적으로 기록합니다.
+    if is_new:
+        report_obj.created_user = current_user.id
+    report_obj.updated_user = current_user.id
 
     if is_new:
         db.session.add(report_obj)
@@ -364,7 +448,6 @@ def saveAction(form):
             except Exception as file_err:
                 print(f"Receipt Upload Error (Line {index}): {file_err}")
         else:
-            # 파일 첨부가 새로 안 된 상태에서 '삭제' 체크박스가 눌렸다면 DB에서 파일 정보 제거
             if delete_flag:
                 item.receipt_file_meta = None
             elif item.id in old_receipts:
@@ -375,6 +458,10 @@ def saveAction(form):
         if removeItem: db.session.delete(removeItem)
 
     db.session.commit()
+    
+    # DB 커밋이 완료된 후 이메일 발송 트리거 호출
+    sendExpenseNotification(report_obj, old_status, new_status)
+    
     return str(report_obj.id)
 
 
