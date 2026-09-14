@@ -15,7 +15,6 @@
     function updateSubCategoryOptions(categorySelect, initialValue = '') {
         const category = categorySelect.val();
         const row = categorySelect.closest('.detail-row');
-        // 💡 콤마(,)를 사용해 기본 name과 하이픈이 포함된 name을 모두 안전하게 찾습니다.
         const subCategorySelect = row.find('select[name="sub_category"], select[name$="-sub_category"]');
         
         subCategorySelect.empty();
@@ -45,6 +44,146 @@
         });
     });
 
+    function guessCategory(csvCategory, description) {
+        var cat = (csvCategory || "").toLowerCase();
+        var desc = (description || "").toLowerCase();
+
+        if (cat.includes('food') || cat.includes('drink') || cat.includes('dining') || cat.includes('restaurant')) {
+            return { category: 'Meals and Entertainment', subCategory: 'Meals with employees' };
+        }
+        if (cat.includes('travel') || cat.includes('airline') || cat.includes('hotel') || cat.includes('transportation')) {
+            if (cat.includes('air') || desc.includes('airline') || desc.includes('flight')) return { category: 'Travel', subCategory: 'Air' };
+            if (cat.includes('hotel') || cat.includes('lodging')) return { category: 'Travel', subCategory: 'Hotel' };
+            if (cat.includes('gas') || cat.includes('transport') || desc.includes('uber') || desc.includes('lyft')) return { category: 'Travel', subCategory: 'Transportation' };
+            return { category: 'Travel', subCategory: 'Other' };
+        }
+        if (cat.includes('gas') || cat.includes('automotive') || cat.includes('auto')) {
+            return { category: 'Travel', subCategory: 'Transportation' };
+        }
+        if (cat.includes('software') || cat.includes('computer') || cat.includes('it') || desc.includes('software')) {
+            return { category: 'IT', subCategory: 'Software' };
+        }
+        if (cat.includes('office') || cat.includes('supplies') || cat.includes('shopping')) {
+            return { category: 'Supplies', subCategory: 'Office' };
+        }
+        return { category: 'Others', subCategory: 'Others' };
+    }
+
+    function parseCSV(text) {
+        var lines = text.split(/\r\n|\n/);
+        if (lines.length === 0) return [];
+        
+        var headerLine = "";
+        var headerIdx = 0;
+        for(var i=0; i<lines.length; i++) {
+            if(lines[i].toLowerCase().indexOf('amount') > -1) {
+                headerLine = lines[i];
+                headerIdx = i;
+                break;
+            }
+        }
+
+        if (!headerLine) {
+            alert("Invalid CSV format. Could not find header containing 'Amount'.");
+            return [];
+        }
+
+        var headers = headerLine.split(",").map(function(h) {
+            return h.replace(/^"|"$/g, '').trim().toLowerCase();
+        });
+        
+        var dateIdx = headers.findIndex(h => h.indexOf('transaction') > -1 && h.indexOf('date') > -1);
+        if (dateIdx === -1) dateIdx = headers.findIndex(h => h.indexOf('date') > -1);
+        var descIdx = headers.findIndex(h => h.indexOf('description') > -1);
+        var amtIdx = headers.findIndex(h => h.indexOf('amount') > -1);
+        var catIdx = headers.findIndex(h => h.indexOf('category') > -1); 
+
+        if (descIdx === -1 || amtIdx === -1) {
+            alert("Invalid CSV format. Could not find Description or Amount columns.");
+            return [];
+        }
+
+        var result = [];
+        for (var i = headerIdx + 1; i < lines.length; i++) {
+            var lineStr = lines[i].trim();
+            if (!lineStr) continue;
+            
+            var currentline = lineStr.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            if (currentline.length > Math.max(descIdx, amtIdx)) {
+                result.push({
+                    date: dateIdx > -1 ? currentline[dateIdx] : "",
+                    desc: currentline[descIdx],
+                    amount: currentline[amtIdx],
+                    csvCat: catIdx > -1 ? currentline[catIdx] : "" 
+                });
+            }
+        }
+        return result;
+    }
+
+    function handleStatementUpload(event) {
+        var file = event.target.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var text = e.target.result;
+                var data = parseCSV(text);
+
+                if (data && data.length > 0) {
+                    data.forEach(function(row) {
+                        try { addLine(); } catch(addErr) {}
+
+                        try {
+                            var detail_section = $('div#detail-section');
+                            var newRow = detail_section.find('div.detail-row').last();
+
+                            if (row.date) {
+                                var dateStr = row.date.replace(/^"|"$/g, '').trim();
+                                var dateParts = dateStr.split('/');
+                                if (dateParts.length === 3) {
+                                    var y = dateParts[2];
+                                    var m = ('0' + dateParts[0]).slice(-2);
+                                    var d = ('0' + dateParts[1]).slice(-2);
+                                    newRow.find('[name$="-expense_date"]').val(y + '-' + m + '-' + d);
+                                }
+                            }
+
+                            if (row.amount) {
+                                var amtRaw = row.amount.replace(/['"]/g, '').replace(/,/g, '').trim();
+                                var amt = parseFloat(amtRaw);
+                                if (!isNaN(amt)) {
+                                    newRow.find('[name$="-amount"]').val((amt * -1).toFixed(2));
+                                }
+                            }
+
+                            var descStr = "";
+                            if (row.desc) {
+                                descStr = row.desc.replace(/^"|"$/g, '').trim();
+                                newRow.find('[name$="-description"]').val(descStr);
+                            }
+
+                            newRow.find('[name$="-expense_type"]').val("Company Card");
+
+                            var guessed = guessCategory(row.csvCat, descStr);
+                            var catSelect = newRow.find('[name$="-category"]');
+                            catSelect.val(guessed.category);
+                            catSelect.trigger('change'); 
+                            newRow.find('[name$="-sub_category"]').val(guessed.subCategory);
+
+                        } catch(mapErr) {
+                            console.log("Ignored Mapping error:", mapErr);
+                        }
+                    });
+                }
+            } catch (mainErr) {
+                alert("An error occurred while parsing the statement file.");
+            }
+        };
+        reader.readAsText(file);
+        $(event.target).val('');
+    }
 
     function addLine() {
         var detail_section = $('div#detail-section');
@@ -58,13 +197,14 @@
 
         insertRow.attr("index", index);
 
-        // 폼 인덱싱
+        // 💡 [수정] 폼 인덱싱에 note 항목 추가
         indexingItem("expense_date", insertRow);
         indexingItem("expense_type", insertRow);
         indexingItem("category", insertRow);
         indexingItem("sub_category", insertRow);
         indexingItem("amount", insertRow);
         indexingItem("description", insertRow);
+        indexingItem("note", insertRow);
         indexingItem("receipt", insertRow); 
         
         detail_section.append(insertRow);
@@ -74,10 +214,7 @@
     function indexingItem(name, row) {
         var index = row.attr("index");
         var item_name_prefix = 'items-' + index;
-        
-        // 💡 [핵심 수정] 하이픈 없는 순수 템플릿(name="amount")과 접두어가 붙은(name$="-amount") 것을 모두 완벽히 잡아냅니다.
         var target = $('[name="' + name + '"], [name$="-' + name + '"]', row);
-        
         target.attr("name", item_name_prefix + '-' + name);
         target.attr("id", item_name_prefix + '-' + name);
     }
@@ -89,21 +226,20 @@
     function submitCheck() {
         var index = 0;
         $('div#detail-section div.detail-row').each(function(i, div){
-            // 💡 [핵심 수정] 제출 전 모든 필드의 인덱스를 재정렬할 때도 누락 없이 필드를 선택합니다.
             $('[name="expense_date"], [name$="-expense_date"]', div).attr("name", "items-" + index + "-expense_date");
             $('[name="expense_type"], [name$="-expense_type"]', div).attr("name", "items-" + index + "-expense_type");
             $('[name="category"], [name$="-category"]', div).attr("name", "items-" + index + "-category");
             $('[name="sub_category"], [name$="-sub_category"]', div).attr("name", "items-" + index + "-sub_category");
             $('[name="amount"], [name$="-amount"]', div).attr("name", "items-" + index + "-amount");
             $('[name="description"], [name$="-description"]', div).attr("name", "items-" + index + "-description");
+            // 💡 [수정] note 항목 저장 파라미터 추가
+            $('[name="note"], [name$="-note"]', div).attr("name", "items-" + index + "-note");
             $('[name="receipt"], [name$="-receipt"]', div).attr("name", "items-" + index + "-receipt");
             
-            // 💡 삭제 체크박스도 저장 시 순서가 꼬이지 않도록 인덱스 재정렬
             var del_chk = $('input[type="checkbox"][name$="-delete_receipt"]', div);
             if (del_chk.length > 0) {
                 del_chk.attr("name", "items-" + index + "-delete_receipt");
             }
-            
             index++;
         });
     }
@@ -133,19 +269,25 @@
         </div>
         <hr>
 
-        <div align="center">
+        <div align="center" style="display: flex; justify-content: center; gap: 15px; align-items: center;">
             <input type="button" class="btn btn-primary btn-sm" onclick="addLine()" value="ADD ITEM" />
+            
+            <div style="border-left: 1px solid #cbd5e1; height: 24px;"></div>
+            <label class="btn btn-success btn-sm" style="margin: 0; cursor: pointer;" title="Upload Chase Bank Statement">
+                <i class="fa fa-upload"></i> UPLOAD STATEMENT (CSV)
+                <input type="file" id="statement-upload" accept=".csv" style="display: none;" onchange="handleStatementUpload(event)">
+            </label>
         </div>
         <br>
 
         <div class="detail-section form-table" id="detail-section">
-            <!-- 💡 [수정] 높이 찌그러짐 방지를 위해 padding과 align-items: center 추가 -->
-            <div class="detail-header" style="display: grid; grid-template-columns: 30px 110px 110px 120px 140px 80px 150px 180px; gap: 5px; padding: 12px 5px; align-items: center;">
-                <div>Act</div><div>Date</div><div>Type</div><div>Category</div><div>Sub Category</div><div>Amount</div><div>Description</div><div>Receipt</div>
+            <!-- 💡 [수정] Grid 간격을 9개 컬럼에 맞게 재배치 (Note 추가) -->
+            <div class="detail-header" style="display: grid; grid-template-columns: 30px 110px 110px 120px 130px 80px 130px 1fr 170px; gap: 5px; padding: 12px 5px; align-items: center;">
+                <div>Act</div><div>Date</div><div>Type</div><div>Category</div><div>Sub Category</div><div>Amount</div><div>Description</div><div>Note</div><div>Receipt</div>
             </div>
 
             {% for item_form in form.items %}
-            <div class="detail-row" index="{{ loop.index0 }}" style="display: grid; grid-template-columns: 30px 110px 110px 120px 140px 80px 150px 180px; gap: 5px; align-items: start; margin-top:5px;">
+            <div class="detail-row" index="{{ loop.index0 }}" style="display: grid; grid-template-columns: 30px 110px 110px 120px 130px 80px 130px 1fr 170px; gap: 5px; align-items: start; margin-top:5px;">
                 <div>
                     {{ item_form.hidden_tag() }}
                     <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
@@ -153,7 +295,6 @@
                 <div>{{ item_form.expense_date(style="width:100%") }}</div>
                 <div>{{ item_form.expense_type(style="width:100%") }}</div>
                 
-                <!-- 💡 [수정] 수동 Select 태그 렌더링 (Category) -->
                 <div>
                     <select name="items-{{ loop.index0 }}-category" id="items-{{ loop.index0 }}-category" style="width:100%">
                         <option value="">Select...</option>
@@ -165,7 +306,6 @@
                     </select>
                 </div>
                 
-                <!-- 💡 [수정] 수동 Select 태그 렌더링 (Sub Category) -->
                 <div>
                     <select name="items-{{ loop.index0 }}-sub_category" id="items-{{ loop.index0 }}-sub_category" style="width:100%" data-selected-value="{{ item_form.sub_category.data or '' }}">
                         <option value="">Select...</option>
@@ -173,9 +313,10 @@
                 </div>
 
                 <div>{{ item_form.amount(style="width:100%") }}</div>
-                <div>{{ item_form['description'](style="width:100%", rows="2") }}</div>
+                <!-- 💡 [수정] description은 한 줄, note는 2줄 입력창으로 배치 -->
+                <div>{{ item_form['description'](style="width:100%") }}</div>
+                <div>{{ item_form.note(style="width:100%", rows="2") }}</div>
             <div>
-                    <!-- 💡 [수정] 파일이 있으면 뷰어 링크와 삭제 체크박스를 함께 렌더링 -->
                     {% if existing_receipts and existing_receipts.get(loop.index0) %}
                         <div style="margin-bottom: 6px; display: flex; align-items: center; gap: 10px;">
                             <a href="{{ existing_receipts[loop.index0]['url'] }}" target="_blank" style="font-size: 0.75rem; text-decoration: underline;">[View]</a>
@@ -199,14 +340,13 @@
 
     <!-- Hidden Template -->
     <div style="display: none;">
-        <div class="detail-row" id="insert_row" index="" style="display: grid; grid-template-columns: 30px 110px 110px 120px 140px 80px 150px 180px; gap: 5px; align-items: start; margin-top:5px;">
+        <div class="detail-row" id="insert_row" index="" style="display: grid; grid-template-columns: 30px 110px 110px 120px 130px 80px 130px 1fr 170px; gap: 5px; align-items: start; margin-top:5px;">
             <div>
                 <a href="javascript:" onclick="deleteRow(this)"><i class="fa fa-minus-square-o"></i></a>
             </div>
             <div>{{ item_form_template.expense_date(style="width:100%") }}</div>
             <div>{{ item_form_template.expense_type(style="width:100%") }}</div>
             
-            <!-- Hidden Template용 수동 Select 태그 -->
             <div>
                 <select name="items-template-category" id="items-template-category" style="width:100%">
                     <option value="">Select...</option>
@@ -224,7 +364,9 @@
             </div>
 
             <div>{{ item_form_template.amount(style="width:100%") }}</div>
-            <div>{{ item_form_template['description'](style="width:100%", rows="2") }}</div>
+            <!-- 💡 [수정] 템플릿에도 동일하게 반영 -->
+            <div>{{ item_form_template['description'](style="width:100%") }}</div>
+            <div>{{ item_form_template.note(style="width:100%", rows="2") }}</div>
             <div>
                 <input type="file" name="items-template-receipt" accept="image/*,application/pdf" style="font-size: 0.75rem; width:100%">
             </div>

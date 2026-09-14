@@ -189,13 +189,14 @@ def do_expense_download(id):
                 'Sub Category': getattr(item, 'sub_category', ''),
                 'Amount': item.amount,
                 'Description': item.description,
+                'Note': getattr(item, 'note', ''),
                 'Receipt Filename': item.receipt_file_meta.split("||URL_INFO:")[0].strip() if item.receipt_file_meta else "No Receipt"
             })
             
         if items_data:
             df_items = pd.DataFrame(items_data)
         else:
-            df_items = pd.DataFrame(columns=['Line', 'Date', 'Type', 'Category', 'Sub Category', 'Amount', 'Description', 'Receipt Filename'])
+            df_items = pd.DataFrame(columns=['Line', 'Date', 'Type', 'Category', 'Sub Category', 'Amount', 'Description', 'Note', 'Receipt Filename'])
             
         df_items.to_excel(writer, sheet_name='Line Items', index=False)
     

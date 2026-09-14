@@ -17,7 +17,8 @@ class ExpenseItemForm(FlaskForm):
     sub_category = StringField("Sub Category")
     
     amount = FloatField("Amount", validators=[Optional()])
-    description = TextAreaField("Description")
+    description = StringField("Description")
+    note = TextAreaField("Note")
     
     class Meta:
         csrf = False

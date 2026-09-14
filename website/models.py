@@ -470,6 +470,7 @@ class ExpenseItem(db.Model):
     sub_category = db.Column(db.String(None)) # 신규 추가
     amount = db.Column(db.Float)
     description = db.Column(db.String(None))
+    note = db.Column(db.String(None))
     receipt_file_meta = db.Column(db.String(None))
     
     # ... (나머지 컬럼은 기존과 동일)

@@ -32,13 +32,11 @@
 <h2 align="center">Expense Report Display</h2>
 <br />
 
-<!-- 상단 버튼 그룹 영역을 아래와 같이 수정하세요 -->
 <div class="form-group expense-list-container mx-sm-3 mb-2">
     <div align="left">
         <input type="button" class="btn btn-primary btn-sm" value="MODIFY" onclick="location.href='/expense/modify/{{ form.id.data }}'">
         <input type="button" class="btn btn-primary btn-sm" value="CREATE WITH REFERENCE" onclick="createWithReference()">
         <input type="button" class="btn btn-primary btn-sm" value="DELETE" onclick="deleteData()">
-        <!-- 다운로드 버튼 클래스를 btn-success에서 btn-primary로 변경 -->
         <input type="button" class="btn btn-primary btn-sm" value="DOWNLOAD" onclick="location.href='/expense/download/{{ form.id.data }}'">
     </div>
 </div>
@@ -47,7 +45,6 @@
 
 <div class="form-group expense-list-container mx-sm-3 mb-2">
 
-    <!-- Header Fields -->
     <div class="input-container">
         <div class="columnlabel">
             {{ form.title.label }}
@@ -82,30 +79,31 @@
    
     <hr>
 
-<!-- Line Items Section -->
-    <!-- Grid Header 교체부 -->
-    <!-- 💡 [수정] 배경색을 어둡게(#4a5568) 하고, 묻힌 글자가 잘 보이도록 흰색(#ffffff !important)으로 지정 -->
-    <div class="detail-header" style="display: grid; grid-template-columns: 110px 120px 120px 130px 90px 1fr 180px; gap: 10px; font-weight: bold; background-color: #4a5568; color: #ffffff !important; padding: 12px 10px; align-items: center; border-radius: 4px 4px 0 0;">
+    <!-- 💡 [수정] Grid 간격을 9개에 맞게 재배치 (Note 추가) -->
+    <div class="detail-header" style="display: grid; grid-template-columns: 100px 110px 110px 120px 80px 130px 1fr 180px; gap: 10px; font-weight: bold; background-color: #4a5568; color: #ffffff !important; padding: 12px 10px; align-items: center; border-radius: 4px 4px 0 0;">
         <div>Date</div>
         <div>Type</div>
         <div>Category</div>
         <div>Sub Category</div>
         <div>Amount</div>
         <div>Description</div>
+        <div>Note</div>
         <div>Receipt</div>
     </div>
 
-        <!-- Grid Items -->
-        <!-- Grid Items -->
         {% if form.items %}
             {% for item_form in form.items %}
-                <div class="detail-row" style="display: grid; grid-template-columns: 110px 120px 120px 130px 90px 1fr 180px; gap: 10px; padding: 10px; border-bottom: 1px solid #e2e8f0; align-items: start;">
+                <div class="detail-row" style="display: grid; grid-template-columns: 100px 110px 110px 120px 80px 130px 1fr 180px; gap: 10px; padding: 10px; border-bottom: 1px solid #e2e8f0; align-items: start;">
                     <div>{{ item_form.expense_date.data.strftime('%Y-%m-%d') if item_form.expense_date.data else "" }}</div>
                     <div>{{ item_form.expense_type.data if item_form.expense_type.data else "" }}</div>
                     <div>{{ item_form.category.data if item_form.category.data else "" }}</div>
                     <div>{{ item_form.sub_category.data if item_form.sub_category.data else "" }}</div>
                     <div style="font-weight: 600;">{{ "$ {:.2f}".format(item_form.amount.data) if item_form.amount.data else "" }}</div>
-                    <div style="white-space: pre-wrap; word-break: break-all;">{{ item_form['description'].data if item_form['description'].data else "" }}</div>
+                    
+                    <!-- 💡 [수정] Description과 Note를 나누어 표시 -->
+                    <div style="word-break: break-all;">{{ item_form.description.data if item_form.description.data else "" }}</div>
+                    <div style="white-space: pre-wrap; word-break: break-all;">{{ item_form.note.data if item_form.note.data else "" }}</div>
+                    
                     <div>
                         {% if existing_receipts and existing_receipts.get(loop.index0) %}
                             <a href="{{ existing_receipts[loop.index0]['url'] }}" target="_blank" title="View Receipt on SharePoint" style="display: inline-flex; align-items: center; gap: 6px; color: #1e40af; text-decoration: none; font-weight: 600; font-size: 0.82rem; background-color: #f0fdf4; padding: 5px 10px; border-radius: 4px; border: 1px solid #bbf7d0; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
