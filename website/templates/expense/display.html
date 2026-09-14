@@ -45,6 +45,7 @@
 
 <div class="form-group expense-list-container mx-sm-3 mb-2">
 
+    <!-- Header Fields -->
     <div class="input-container">
         <div class="columnlabel">
             {{ form.title.label }}
@@ -76,10 +77,54 @@
             {{ form.remark.data }}
         </div>
     </div>
+    
+    <!-- 💡 [신규 추가] 타입별 금액 합산 로직 (Jinja2) -->
+    {% set totals = namespace(company_card=0.0, reimburse=0.0) %}
+    {% if form.items %}
+        {% for item_form in form.items %}
+            {% set amt = item_form.amount.data %}
+            {% if amt %}
+                {% if item_form.expense_type.data == 'Company Card' %}
+                    {% set totals.company_card = totals.company_card + amt %}
+                {% elif item_form.expense_type.data == 'Reimburse' %}
+                    {% set totals.reimburse = totals.reimburse + amt %}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <!-- 💡 [신규 추가] 합계 출력 화면 -->
+    <div class="input-container">
+        <div class="columnlabel" style="font-weight: bold; color: #1e293b; background-color: #f1f5f9;">
+            <i class="fa fa-credit-card" style="color: #0ea5e9; margin-right: 5px;"></i> Company Card
+        </div>
+        <div class="columninput uneditable" style="font-weight: bold; color: #0284c7; background-color: #f8fafc;">
+            $ {{ "{:,.2f}".format(totals.company_card) }}
+        </div>
+        
+        <div class="columnlabel" style="font-weight: bold; color: #1e293b; background-color: #f1f5f9;">
+            <i class="fa fa-money" style="color: #22c55e; margin-right: 5px;"></i> Reimburse
+        </div>
+        <div class="columninput uneditable" style="font-weight: bold; color: #16a34a; background-color: #f8fafc;">
+            $ {{ "{:,.2f}".format(totals.reimburse) }}
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div class="columnlabel" style="font-weight: bold; color: #991b1b; background-color: #fee2e2;">
+            <i class="fa fa-calculator" style="color: #dc2626; margin-right: 5px;"></i> Total Amount
+        </div>
+        <div class="columninput uneditable" style="font-weight: bold; color: #dc2626; background-color: #fef2f2; font-size: 1.1em;">
+            $ {{ "{:,.2f}".format(totals.company_card + totals.reimburse) }}
+        </div>
+        
+        <!-- 레이아웃 비율 유지를 위한 빈 칸 -->
+        <div class="columnlabel" style="border: none; background-color: transparent;"></div>
+        <div class="columninput uneditable" style="border: none; background-color: transparent;"></div>
+    </div>
    
     <hr>
 
-    <!-- 💡 [수정] Grid 간격을 9개에 맞게 재배치 (Note 추가) -->
     <div class="detail-header" style="display: grid; grid-template-columns: 100px 110px 110px 120px 80px 130px 1fr 180px; gap: 10px; font-weight: bold; background-color: #4a5568; color: #ffffff !important; padding: 12px 10px; align-items: center; border-radius: 4px 4px 0 0;">
         <div>Date</div>
         <div>Type</div>
@@ -100,8 +145,7 @@
                     <div>{{ item_form.sub_category.data if item_form.sub_category.data else "" }}</div>
                     <div style="font-weight: 600;">{{ "$ {:.2f}".format(item_form.amount.data) if item_form.amount.data else "" }}</div>
                     
-                    <!-- 💡 [수정] Description과 Note를 나누어 표시 -->
-                    <div style="word-break: break-all;">{{ item_form.description.data if item_form.description.data else "" }}</div>
+                    <div style="word-break: break-all;">{{ item_form['description'].data if item_form['description'].data else "" }}</div>
                     <div style="white-space: pre-wrap; word-break: break-all;">{{ item_form.note.data if item_form.note.data else "" }}</div>
                     
                     <div>
