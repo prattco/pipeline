@@ -9,6 +9,7 @@
         'Meals and Entertainment': ['Meals with client', 'Meals with employees'], 
         'IT': ['Hardware', 'Software'],
         'Supplies': ['Office', 'Warehouse'],
+        'Marketing': ['Trade Show', 'Others'],
         'Others': ['Others']
     };
 
@@ -302,6 +303,7 @@
                         <option value="Meals and Entertainment" {% if item_form.category.data == 'Meals and Entertainment' %}selected{% endif %}>Meals and Entertainment</option>
                         <option value="IT" {% if item_form.category.data == 'IT' %}selected{% endif %}>IT</option>
                         <option value="Supplies" {% if item_form.category.data == 'Supplies' %}selected{% endif %}>Supplies</option>
+                        <option value="Marketing" {% if item_form.category.data == 'Marketing' %}selected{% endif %}>Marketing</option>
                         <option value="Others" {% if item_form.category.data == 'Others' %}selected{% endif %}>Others</option>
                     </select>
                 </div>
@@ -354,6 +356,7 @@
                     <option value="Meals and Entertainment">Meals and Entertainment</option>
                     <option value="IT">IT</option>
                     <option value="Supplies">Supplies</option>
+                    <option value="Marketing">Marketing</option>
                     <option value="Others">Others</option>
                 </select>
             </div>
