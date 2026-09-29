@@ -36,33 +36,35 @@
 <div style="display: flex; justify-content: center;">
     <table id="list" class="display stripe compact" style="width: 95%;">
         <thead>
-            <!-- 💡 [수정] 테이블 헤더 순서 재배치 -->
+            <!-- 첫 번째 줄 헤더: 정렬 및 넓이 지정 -->
             <tr>
                 <th>Title</th>
-                <th>Status</th>
+                <th style="width: 85px; text-align: left;">Status</th>
                 <th>Owner</th>
-                <th>Remark</th>
-                <th>Created User</th>
-                <th>Created Date</th>
-                <th>Updated User</th>
-                <th>Updated Date</th>
-
+                <th style="width: 300px; text-align: left;">Remark</th>
+                <th style="width: 120px; text-align: left;">Created User</th>
+                <th style="width: 110px; text-align: left;">Created Date</th>
+                <th style="width: 120px; text-align: left;">Updated User</th>
+                <th style="width: 110px; text-align: left;">Updated Date</th>
             </tr>
+            <!-- 두 번째 줄 필터: input 크기 제한 및 placeholder 축소 -->
             <tr>
                 <th><input type="text" data-column="0" class="filter-input" placeholder="Filter Title"></th>
-                <th><input type="text" data-column="1" class="filter-input" placeholder="Filter Status"></th>
+                <th><input type="text" data-column="1" class="filter-input" placeholder="Filter Status" style="width: 85px;"></th>
                 <th><input type="text" data-column="2" class="filter-input" placeholder="Filter Owner"></th>
-                <th><input type="text" data-column="3" class="filter-input" placeholder="Filter Remark"></th>
-                <th><input type="text" data-column="4" class="filter-input" placeholder="Filter Created User"></th>
-                <th><input type="text" data-column="5" class="filter-input" placeholder="Filter Created Date"></th>
-                <th><input type="text" data-column="6" class="filter-input" placeholder="Filter Updated User"></th>
-                <th><input type="text" data-column="7" class="filter-input" placeholder="Filter Updated Date"></th>
-                
+                <th><input type="text" data-column="3" class="filter-input" placeholder="Filter Remark" style="width: 300px;"></th>
+                <th><input type="text" data-column="4" class="filter-input" placeholder="Filter User" style="width: 120px;"></th>
+                <th style="text-align: left;">
+                    <input type="text" data-column="5" class="filter-input" placeholder="Filter Date" style="width: 110px;">
+                </th>
+                <th><input type="text" data-column="6" class="filter-input" placeholder="Filter User" style="width: 120px;"></th>
+                <th style="text-align: left;">
+                    <input type="text" data-column="7" class="filter-input" placeholder="Filter Date" style="width: 110px;">
+                </th>
             </tr>
         </thead>
 
         <tbody>
-            <!-- 💡 [수정] 테이블 데이터(Body) 출력 순서 재배치 -->
             {% for expense in list %}
             <tr>
                 <td>
@@ -72,14 +74,15 @@
                 <td>{{ expense.owner.strip() if expense.owner else "" }}</td>
                 <td>{{ expense.remark.strip() if expense.remark else "" }}</td>
                 <td>
-                    <a href="/expense/display/{{ expense.id }}">{{ expense.created_user_name }}</td></a>
-                <td>{{ expense.created_date_cst }}</td>
+                    <a href="/expense/display/{{ expense.id }}">{{ expense.created_user_name }}</a>
+                </td>
+                <td style="text-align: left;">{{ expense.created_date_cst }}</td>
                 <td>{{ expense.updated_user_name }}</td>                
-                <td>{{ expense.updated_date_cst }}</td>
-
+                <td style="text-align: left;">{{ expense.updated_date_cst }}</td>
             </tr>
             {% endfor %}
         </tbody>
+    
     </table>
 </div>
 
@@ -98,8 +101,18 @@
             order: [[5, 'desc']], 
             pageLength: 100,
             autoWidth: false, 
-            responsive: true
+            responsive: true,
+            // 👇 여기에 columnDefs 속성을 추가합니다.
+            columnDefs: [
+                { 
+                    targets: [5, 7],        // 5번째(Created Date), 7번째(Updated Date) 열 지정
+                    width: "90px",          // 원하는 넓이로 조절 (예: 90px, 10% 등)
+                    className: "dt-left"    // 텍스트를 왼쪽으로 정렬
+                }
+            ]
         });
+
+        // ... 기존 코드 유지 ...
 
         $('#column-selector').select2({
             placeholder: "Select columns",
